@@ -1,0 +1,42 @@
+/*
+Theme Name: عالم الأناقة
+Theme URI: https://lavender-cat-628940.hostingersite.com/
+Description: قالب متجر أناقة متكامل بنظام ألوان تكيفي
+Version: 1.0.0
+Author: Gamal-Alsabri
+Author URI: https://yourwebsite.com
+Text Domain: fashion-world
+Requires PHP: 7.4
+Requires at least: WordPress 6.0
+License: GNU General Public License v3 or later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
+
+ألوان تكيفية | تصميم متجاوب | نظام إدارة متكامل
+*/
+
+/* === المتغيرات الأساسية === */
+:root {
+    --color-primary: #d4a85c; /* ذهبي */
+    --color-secondary: #1a1a1a; /* أسود */
+    --color-accent: #e8d7c3; /* كريمي */
+    
+    --spacing-xs: 8px;
+    --spacing-sm: 16px;
+    --spacing-md: 24px;
+    --spacing-lg: 32px;
+    --spacing-xl: 48px;
+}
+
+/* === الأنماط العامة === */
+body {
+    font-family: 'Lora', serif;
+    background-color: var(--color-secondary);
+    color: var(--color-accent);
+    line-height: 1.6;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
