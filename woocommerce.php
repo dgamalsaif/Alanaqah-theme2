@@ -1,0 +1,1 @@
+<?php /** * The template for displaying all WooCommerce pages. * @package AlamAlAnika */ get_header(); ?> <div id="primary" class="content-area container" style="padding: 40px 20px;"> <main id="main" class="site-main" role="main"> <?php woocommerce_content(); ?> </main> </div> <?php get_footer(); ?>
