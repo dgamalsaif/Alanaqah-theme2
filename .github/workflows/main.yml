@@ -1,100 +1,122 @@
- name: Check Existing Color Swatches Code
+name: WordPress Theme Validation
 
 on:
-  workflow_dispatch
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
 
 jobs:
-  check-existing-code:
+  theme-validation:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
     
-    - name: البحث عن أنماط Color Swatches في CSS
-      run: |
-        echo "🔍 البحث عن أنماط Color Swatches في ملفات CSS..."
-        
-        # البحث في جميع ملفات CSS
-        CSS_FILES=$(find . -name "*.css" -not -path "./.github/*")
-        
-        for css_file in $CSS_FILES; do
-            echo "📁 فحص ملف: $css_file"
-            
-            # البحث عن أنماط swatches
-            if grep -q -i "color-swatch\|swatch\|color.*circle" "$css_file"; then
-                echo "🎨 found color swatch styles in: $css_file"
-                grep -n -i "color-swatch\|swatch\|color.*circle" "$css_file" | head -5
-                echo "---"
-            fi
-            
-            # البحث عن ألوان محددة
-            if grep -q -i "#ff2b4d\|#e0e0e0\|#f5a623" "$css_file"; then
-                echo "🎯 found specific colors in: $css_file"
-                grep -n -i "#ff2b4d\|#e0e0e0\|#f5a623" "$css_file" | head -3
-                echo "---"
-            fi
-        done
-        
-        if [ -z "$CSS_FILES" ]; then
-            echo "⚪ لم يتم العثور على أي ملفات CSS"
-        fi
+    steps:
+    - name: تحميل الكود من المستودع
+      uses: actions/checkout@v3
 
-    - name: البحث عن كود Color Swatches في JavaScript
+    - name: التحقق من الهيكل الأساسي
       run: |
-        echo "🔍 البحث عن كود Color Swatches في ملفات JS..."
+        echo "📁 التحقق من هيكل القالب المتكامل..."
         
-        # البحث في جميع ملفات JavaScript
-        JS_FILES=$(find . -name "*.js" -not -path "./.github/*" -not -path "./assets/js/vendor/*")
-        
-        for js_file in $JS_FILES; do
-            echo "📁 فحص ملف: $js_file"
-            
-            # البحث عن كود swatches
-            if grep -q -i "swatch\|color.*click\|attribute.*select" "$js_file"; then
-                echo "⚡ found swatch-related code in: $js_file"
-                grep -n -i "swatch\|color.*click\|attribute.*select" "$js_file" | head -5
-                echo "---"
-            fi
-            
-            # البحث عن أحداث variation
-            if grep -q -i "variation\|woocommerce.*change" "$js_file"; then
-                echo "🛒 found variation code in: $js_file"
-                grep -n -i "variation\|woocommerce.*change" "$js_file" | head -3
-                echo "---"
-            fi
+        # الملفات الأساسية الإلزامية
+        REQUIRED_FILES=("style.css" "index.php" "functions.php")
+        for file in "${REQUIRED_FILES[@]}"; do
+          if [ ! -f "$file" ]; then
+            echo "❌ ملف إلزامي غير موجود: $file"
+            exit 1
+          fi
+          echo "✅ موجود: $file"
         done
+
+    - name: فحص ملفات JavaScript الأساسية
+      run: |
+        echo "🔍 فحص ملفات JavaScript..."
+        
+        # البحث عن جميع ملفات JavaScript
+        JS_FILES=$(find . -name "*.js" -not -path "./.github/*" 2>/dev/null || true)
         
         if [ -z "$JS_FILES" ]; then
-            echo "⚪ لم يتم العثور على أي ملفات JS"
+          echo "⚪ لم يتم العثور على أي ملفات JavaScript"
+          exit 0
         fi
-
-    - name: التحقق من وجود مجلد add-to-cart
-      run: |
-        echo "📁 التحقق من هيكل woocommerce..."
         
-        if [ -d "woocommerce/single-product/add-to-cart" ]; then
-            echo "✅ مجلد add-to-cart موجود"
-            find "woocommerce/single-product/add-to-cart" -name "*.php" | while read file; do
-                echo "📄 ملف موجود: $file"
-                if grep -q -i "variation\|color\|swatch" "$file"; then
-                    echo "🎨 found swatch-related code in: $file"
-                    grep -n -i "variation\|color\|swatch" "$file" | head -3
-                fi
-            done
+        echo "📊 عدد ملفات JavaScript الموجودة: $(echo "$JS_FILES" | wc -l)"
+        echo "📋 قائمة ملفات JavaScript:"
+        echo "$JS_FILES"
+
+    - name: فحص المكتبات بدون npm
+      run: |
+        echo "🔎 البحث عن المكتبات الشائعة بدون npm..."
+        
+        LIBRARIES=("jquery" "react" "vue" "axios" "lodash" "bootstrap" "swiper" "gsap")
+        for lib in "${LIBRARIES[@]}"; do
+          if grep -r -i "$lib" . --include="*.js" --include="*.php" --exclude-dir=.git 2>/dev/null; then
+            echo "✅ موجودة: $lib"
+          else
+            echo "⚪ غير موجودة: $lib"
+          fi
+        done
+
+    - name: فحص جودة JavaScript الأساسي
+      run: |
+        echo "🛠️ فحص جودة كود JavaScript الأساسي..."
+        
+        JS_FILES=$(find . -name "*.js" -not -path "./.github/*" 2>/dev/null || true)
+        
+        for js_file in $JS_FILES; do
+          echo "🔍 فحص ملف: $(basename "$js_file")"
+          
+          # فحص بسيط للأخطاء الشائعة
+          if grep -q "console.log" "$js_file"; then
+            echo "⚠️  يحتوي على console.log"
+          fi
+          
+          # فحص الأحجام
+          size=$(wc -c < "$js_file" 2>/dev/null || echo "0")
+          if [ "$size" -gt 100000 ]; then
+            echo "📏 حجم الملف: $((size/1000)) KB (كبير)"
+          else
+            echo "📏 حجم الملف: $((size/1000)) KB"
+          fi
+        done
+
+    - name: فحص مكونات القالب المتقدمة
+      run: |
+        echo "🔍 البحث عن مكونات متقدمة..."
+        
+        # البحث عن Slider
+        SLIDER_FILES=$(grep -l -i "slider\|carousel" *.php 2>/dev/null || true)
+        if [ -n "$SLIDER_FILES" ]; then
+          echo "🎠 ملفات تحتوي على Slider:"
+          echo "$SLIDER_FILES"
         else
-            echo "⚪ مجلد add-to-cart غير موجود"
-            echo "📋 الهيكل الحالي لـ woocommerce:"
-            find "woocommerce" -type f -name "*.php" | head -10
+          echo "⚪ لم يتم العثور على مكون Slider"
+        fi
+        
+        # البحث عن Hero section
+        HERO_FILES=$(grep -l -i "hero\|banner" *.php 2>/dev/null || true)
+        if [ -n "$HERO_FILES" ]; then
+          echo "🦸 ملفات تحتوي على Hero:"
+          echo "$HERO_FILES"
+        else
+          echo "⚪ لم يتم العثور على مكون Hero"
         fi
 
-    - name: تقرير النتائج
+    - name: فحص الألوان والتصميم
       run: |
-        echo "📊 تقرير التحقق من Color Swatches:"
-        echo "=========================================="
-        echo "✅ تم فحص جميع ملفات CSS و JS ذات الصلة"
-        echo "🔍 البحث عن أنماط: color-swatch, swatch, variation"
-        echo "📁 تم فحص هيكل مجلدات woocommerce"
-        echo "=========================================="
-        echo "📋 الخطوات التالية بناء على النتائج:"
-        echo "1. إذا وجدت الأكواد: سيتم تحسينها وتطويرها"
-        echo "2. إذا لم توجد: سيتم إضافتها بشكل صحيح"
-        echo "3. سيكون التركيز على الدمج مع الكود الحالي"
+        echo "🎨 فحص نظام الألوان..."
+        
+        CSS_FILES=$(find . -name "*.css" -not -path "./.github/*" 2>/dev/null || true)
+        if [ -n "$CSS_FILES" ]; then
+          echo "📊 الألوان المستخدمة:"
+          grep -h -E -i "(#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})|rgb\(|rgba\(|hsl\()" $CSS_FILES 2>/dev/null | \
+          sort | uniq | head -10 || echo "⚪ لا توجد ألوان محددة"
+        else
+          echo "⚪ لا توجد ملفات CSS"
+        fi
+
+    - name: تقرير نهائي
+      run: |
+        echo "🎉 تم الانتهاء من الفحص!"
+        echo "📋 النتائج متاحة أعلاه"
+        echo "✅ لا حاجة لـ Node.js أو npm"
