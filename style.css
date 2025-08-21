@@ -1,4 +1,5 @@
- /*
+```css name=style.css
+/*
 Theme Name: عالم الأناقة
 Theme URI: https://example.com/alam-al-anika
 Author: Your Name
@@ -549,10 +550,48 @@ body {
         height: 400px;
     }
 }
-/* ========================================================================== # Swatches Styles (Corrected) ========================================================================== */
-/* Hide the default WooCommerce dropdown AND label for the color attribute */
- .swatches-active .variations tr .label,
+
+/* ========================== Variation Swatches Styles ========================== */
+/* Hide the default WooCommerce dropdown and label for the color attribute */
+.swatches-active .variations tr .label,
 .swatches-active .variations tr .value {
     display: none;
 }
-/* Container for our custom swatches */ .swatch-container { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; } /* Individual swatch style */ .swatch { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid var(--border-color); position: relative; transition: all 0.2s ease; } .swatch:hover { border-color: var(--secondary-color); } /* Style for the currently selected swatch */ .swatch.selected { border-color: var(--primary-color); box-shadow: 0 0 5px rgba(255, 43, 77, 0.5); } /* Checkmark icon for the selected swatch */ .swatch.selected::after { content: "✓"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-weight: bold; font-size: 20px; text-shadow: 0 0 3px rgba(0,0,0,0.7); }
+/* Container for custom swatches */
+.swatch-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+/* Individual swatch style */
+.swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--border-color);
+    position: relative;
+    transition: all 0.2s ease;
+}
+.swatch:hover {
+    border-color: var(--secondary-color);
+}
+/* Style for the currently selected swatch */
+.swatch.selected {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(255, 43, 77, 0.5);
+}
+/* Checkmark icon for the selected swatch */
+.swatch.selected::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    text-shadow: 0 0 3px rgba(0,0,0,0.7);
+}
+```
