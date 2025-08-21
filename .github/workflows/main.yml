@@ -1,122 +1,126 @@
-name: WordPress Theme Validation
+name: WordPress Theme CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [ main, development ]
   pull_request:
-    branches: [main, master]
+    branches: [ main ]
 
 jobs:
-  theme-validation:
+  theme-test:
     runs-on: ubuntu-latest
     
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
     steps:
-    - name: تحميل الكود من المستودع
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: التحقق من الهيكل الأساسي
-      run: |
-        echo "📁 التحقق من هيكل القالب المتكامل..."
-        
-        # الملفات الأساسية الإلزامية
-        REQUIRED_FILES=("style.css" "index.php" "functions.php")
-        for file in "${REQUIRED_FILES[@]}"; do
-          if [ ! -f "$file" ]; then
-            echo "❌ ملف إلزامي غير موجود: $file"
-            exit 1
-          fi
-          echo "✅ موجود: $file"
-        done
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: mbstring, xml, curl, mysql, zip
+        ini-values: post_max_size=256M, upload_max_filesize=256M
 
-    - name: فحص ملفات JavaScript الأساسية
-      run: |
-        echo "🔍 فحص ملفات JavaScript..."
-        
-        # البحث عن جميع ملفات JavaScript
-        JS_FILES=$(find . -name "*.js" -not -path "./.github/*" 2>/dev/null || true)
-        
-        if [ -z "$JS_FILES" ]; then
-          echo "⚪ لم يتم العثور على أي ملفات JavaScript"
-          exit 0
-        fi
-        
-        echo "📊 عدد ملفات JavaScript الموجودة: $(echo "$JS_FILES" | wc -l)"
-        echo "📋 قائمة ملفات JavaScript:"
-        echo "$JS_FILES"
+    - name: Validate composer.json
+      run: composer validate --no-check-all
 
-    - name: فحص المكتبات بدون npm
+    - name: Install dependencies
       run: |
-        echo "🔎 البحث عن المكتبات الشائعة بدون npm..."
-        
-        LIBRARIES=("jquery" "react" "vue" "axios" "lodash" "bootstrap" "swiper" "gsap")
-        for lib in "${LIBRARIES[@]}"; do
-          if grep -r -i "$lib" . --include="*.js" --include="*.php" --exclude-dir=.git 2>/dev/null; then
-            echo "✅ موجودة: $lib"
-          else
-            echo "⚪ غير موجودة: $lib"
-          fi
-        done
+        composer install --prefer-dist --no-progress --no-interaction
+        npm ci
 
-    - name: فحص جودة JavaScript الأساسي
+    - name: Setup WordPress test environment
       run: |
-        echo "🛠️ فحص جودة كود JavaScript الأساسي..."
-        
-        JS_FILES=$(find . -name "*.js" -not -path "./.github/*" 2>/dev/null || true)
-        
-        for js_file in $JS_FILES; do
-          echo "🔍 فحص ملف: $(basename "$js_file")"
-          
-          # فحص بسيط للأخطاء الشائعة
-          if grep -q "console.log" "$js_file"; then
-            echo "⚠️  يحتوي على console.log"
-          fi
-          
-          # فحص الأحجام
-          size=$(wc -c < "$js_file" 2>/dev/null || echo "0")
-          if [ "$size" -gt 100000 ]; then
-            echo "📏 حجم الملف: $((size/1000)) KB (كبير)"
-          else
-            echo "📏 حجم الملف: $((size/1000)) KB"
-          fi
-        done
+        bash tests/bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest
 
-    - name: فحص مكونات القالب المتقدمة
+    - name: PHP Syntax check
       run: |
-        echo "🔍 البحث عن مكونات متقدمة..."
-        
-        # البحث عن Slider
-        SLIDER_FILES=$(grep -l -i "slider\|carousel" *.php 2>/dev/null || true)
-        if [ -n "$SLIDER_FILES" ]; then
-          echo "🎠 ملفات تحتوي على Slider:"
-          echo "$SLIDER_FILES"
-        else
-          echo "⚪ لم يتم العثور على مكون Slider"
-        fi
-        
-        # البحث عن Hero section
-        HERO_FILES=$(grep -l -i "hero\|banner" *.php 2>/dev/null || true)
-        if [ -n "$HERO_FILES" ]; then
-          echo "🦸 ملفات تحتوي على Hero:"
-          echo "$HERO_FILES"
-        else
-          echo "⚪ لم يتم العثور على مكون Hero"
-        fi
+        find . -name "*.php" -exec php -l {} \;
 
-    - name: فحص الألوان والتصميم
+    - name: Run PHP Code Sniffer
       run: |
-        echo "🎨 فحص نظام الألوان..."
-        
-        CSS_FILES=$(find . -name "*.css" -not -path "./.github/*" 2>/dev/null || true)
-        if [ -n "$CSS_FILES" ]; then
-          echo "📊 الألوان المستخدمة:"
-          grep -h -E -i "(#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})|rgb\(|rgba\(|hsl\()" $CSS_FILES 2>/dev/null | \
-          sort | uniq | head -10 || echo "⚪ لا توجد ألوان محددة"
-        else
-          echo "⚪ لا توجد ملفات CSS"
-        fi
+        composer run phpcs
 
-    - name: تقرير نهائي
+    - name: Run PHPUnit tests
       run: |
-        echo "🎉 تم الانتهاء من الفحص!"
-        echo "📋 النتائج متاحة أعلاه"
-        echo "✅ لا حاجة لـ Node.js أو npm"
+        composer run phpunit
+
+    - name: Run JavaScript tests
+      run: |
+        npm test
+
+    - name: Security scan with WPCS
+      run: |
+        composer run security
+
+    - name: Check theme version consistency
+      run: |
+        ./bin/check-version-consistency
+
+    - name: Theme check
+      run: |
+        ./bin/theme-check
+
+    - name: Build assets
+      run: |
+        npm run build
+
+    - name: Create deployment package
+      run: |
+        mkdir deployment
+        rsync -av --exclude='.git' --exclude='node_modules' --exclude='vendor' --exclude='.github' . deployment/
+        cd deployment && zip -r ../alam-al-anika-theme.zip .
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: alam-al-anika-theme
+        path: alam-al-anika-theme.zip
+
+  lint-css:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run CSS lint
+      run: npm run lint:css
+
+  accessibility-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run accessibility tests
+      run: npm run test:a11y
