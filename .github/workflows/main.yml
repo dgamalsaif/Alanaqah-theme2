@@ -1,4 +1,4 @@
-name: Check Existing Color Swatches Code
+ name: Check Existing Color Swatches Code
 
 on:
   workflow_dispatch
@@ -98,4 +98,3 @@ jobs:
         echo "1. إذا وجدت الأكواد: سيتم تحسينها وتطويرها"
         echo "2. إذا لم توجد: سيتم إضافتها بشكل صحيح"
         echo "3. سيكون التركيز على الدمج مع الكود الحالي"
-
