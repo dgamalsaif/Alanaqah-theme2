@@ -1,122 +1,34 @@
-name: WordPress Theme Validation
+name: Analyze Theme Structure
 
 on:
   push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
+    branches: [main]
 
 jobs:
-  theme-validation:
+  analyze-theme:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: تحميل الكود من المستودع
+    - name: تحميل الكود
       uses: actions/checkout@v3
 
-    - name: التحقق من الهيكل الأساسي
+    - name: تحليل هيكل القالب
       run: |
-        echo "📁 التحقق من هيكل القالب المتكامل..."
+        echo "📁 تحليل هيكل القالب الموجود..."
         
-        # الملفات الأساسية الإلزامية
-        REQUIRED_FILES=("style.css" "index.php" "functions.php")
-        for file in "${REQUIRED_FILES[@]}"; do
-          if [ ! -f "$file" ]; then
-            echo "❌ ملف إلزامي غير موجود: $file"
-            exit 1
-          fi
-          echo "✅ موجود: $file"
-        done
-
-    - name: فحص ملفات JavaScript الأساسية
-      run: |
-        echo "🔍 فحص ملفات JavaScript..."
+        # البحث عن ملفات ووكومرس
+        echo "🔍 البحث عن ملفات ووكومرس:"
+        find . -path "*/woocommerce/*" -name "*.php" | head -10 || echo "⚪ لم يتم العثور على مجلد woocommerce مخصص"
         
-        # البحث عن جميع ملفات JavaScript
-        JS_FILES=$(find . -name "*.js" -not -path "./.github/*" 2>/dev/null || true)
+        # البحث عن ملفات المنتجات
+        echo "📦 البحث عن ملفات المنتج:"
+        find . -name "*product*" -type f | grep -E "\.(php|css|js)$" | head -10
         
-        if [ -z "$JS_FILES" ]; then
-          echo "⚪ لم يتم العثور على أي ملفات JavaScript"
-          exit 0
+        # تحليل هيكل السمات
+        echo "🎨 تحليل هيكل السمات:"
+        if [ -d "wp-content/themes" ]; then
+            find wp-content/themes/ -name "style.css" -exec grep -l "Theme Name" {} \;
         fi
         
-        echo "📊 عدد ملفات JavaScript الموجودة: $(echo "$JS_FILES" | wc -l)"
-        echo "📋 قائمة ملفات JavaScript:"
-        echo "$JS_FILES"
-
-    - name: فحص المكتبات بدون npm
-      run: |
-        echo "🔎 البحث عن المكتبات الشائعة بدون npm..."
-        
-        LIBRARIES=("jquery" "react" "vue" "axios" "lodash" "bootstrap" "swiper" "gsap")
-        for lib in "${LIBRARIES[@]}"; do
-          if grep -r -i "$lib" . --include="*.js" --include="*.php" --exclude-dir=.git 2>/dev/null; then
-            echo "✅ موجودة: $lib"
-          else
-            echo "⚪ غير موجودة: $lib"
-          fi
-        done
-
-    - name: فحص جودة JavaScript الأساسي
-      run: |
-        echo "🛠️ فحص جودة كود JavaScript الأساسي..."
-        
-        JS_FILES=$(find . -name "*.js" -not -path "./.github/*" 2>/dev/null || true)
-        
-        for js_file in $JS_FILES; do
-          echo "🔍 فحص ملف: $(basename "$js_file")"
-          
-          # فحص بسيط للأخطاء الشائعة
-          if grep -q "console.log" "$js_file"; then
-            echo "⚠️  يحتوي على console.log"
-          fi
-          
-          # فحص الأحجام
-          size=$(wc -c < "$js_file" 2>/dev/null || echo "0")
-          if [ "$size" -gt 100000 ]; then
-            echo "📏 حجم الملف: $((size/1000)) KB (كبير)"
-          else
-            echo "📏 حجم الملف: $((size/1000)) KB"
-          fi
-        done
-
-    - name: فحص مكونات القالب المتقدمة
-      run: |
-        echo "🔍 البحث عن مكونات متقدمة..."
-        
-        # البحث عن Slider
-        SLIDER_FILES=$(grep -l -i "slider\|carousel" *.php 2>/dev/null || true)
-        if [ -n "$SLIDER_FILES" ]; then
-          echo "🎠 ملفات تحتوي على Slider:"
-          echo "$SLIDER_FILES"
-        else
-          echo "⚪ لم يتم العثور على مكون Slider"
-        fi
-        
-        # البحث عن Hero section
-        HERO_FILES=$(grep -l -i "hero\|banner" *.php 2>/dev/null || true)
-        if [ -n "$HERO_FILES" ]; then
-          echo "🦸 ملفات تحتوي على Hero:"
-          echo "$HERO_FILES"
-        else
-          echo "⚪ لم يتم العثور على مكون Hero"
-        fi
-
-    - name: فحص الألوان والتصميم
-      run: |
-        echo "🎨 فحص نظام الألوان..."
-        
-        CSS_FILES=$(find . -name "*.css" -not -path "./.github/*" 2>/dev/null || true)
-        if [ -n "$CSS_FILES" ]; then
-          echo "📊 الألوان المستخدمة:"
-          grep -h -E -i "(#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})|rgb\(|rgba\(|hsl\()" $CSS_FILES 2>/dev/null | \
-          sort | uniq | head -10 || echo "⚪ لا توجد ألوان محددة"
-        else
-          echo "⚪ لا توجد ملفات CSS"
-        fi
-
-    - name: تقرير نهائي
-      run: |
-        echo "🎉 تم الانتهاء من الفحص!"
-        echo "📋 النتائج متاحة أعلاه"
-        echo "✅ لا حاجة لـ Node.js أو npm"
+        # إنشاء تقرير بالهيكل الحالي
+        echo "📊 تقرير الهيكل الحالي:"
+        find . -maxdepth 3 -type d -not -path "./.git/*" -not -path "./.github/*" | sort
