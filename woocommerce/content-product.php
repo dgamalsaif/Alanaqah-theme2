@@ -1,3 +1,4 @@
+```php name=woocommerce/content-product.php
 <?php
 /**
  * The template for displaying product content within loops.
@@ -79,3 +80,4 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 		?>
 	</div>
 </li>
+```
