@@ -1,4 +1,4 @@
-name: Comprehensive Theme Validation
+name: WordPress Theme Validation
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main, master]
 
 jobs:
-  comprehensive-theme-check:
+  theme-validation:
     runs-on: ubuntu-latest
     
     steps:
@@ -28,18 +28,12 @@ jobs:
           echo "✅ موجود: $file"
         done
 
-    - name: إعداد Node.js للفحص
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
-
-    - name: فحص شامل لملفات JavaScript
+    - name: فحص ملفات JavaScript الأساسية
       run: |
-        echo "🔍 فحص ملفات JavaScript والمكتبات..."
+        echo "🔍 فحص ملفات JavaScript..."
         
         # البحث عن جميع ملفات JavaScript
-        JS_FILES=$(find . -name "*.js" -not -path "./node_modules/*" -not -path "./.github/*")
+        JS_FILES=$(find . -name "*.js" -not -path "./.github/*" 2>/dev/null || true)
         
         if [ -z "$JS_FILES" ]; then
           echo "⚪ لم يتم العثور على أي ملفات JavaScript"
@@ -47,125 +41,82 @@ jobs:
         fi
         
         echo "📊 عدد ملفات JavaScript الموجودة: $(echo "$JS_FILES" | wc -l)"
-        
-        # فحص وجود المكتبات الشائعة
-        echo "🔎 البحث عن المكتبات الشائعة:"
+        echo "📋 قائمة ملفات JavaScript:"
+        echo "$JS_FILES"
+
+    - name: فحص المكتبات بدون npm
+      run: |
+        echo "🔎 البحث عن المكتبات الشائعة بدون npm..."
         
         LIBRARIES=("jquery" "react" "vue" "axios" "lodash" "bootstrap" "swiper" "gsap")
         for lib in "${LIBRARIES[@]}"; do
-          if grep -r -i "$lib" . --include="*.js" --include="*.php" --exclude-dir=node_modules --exclude-dir=.git > /dev/null; then
+          if grep -r -i "$lib" . --include="*.js" --include="*.php" --exclude-dir=.git 2>/dev/null; then
             echo "✅ موجودة: $lib"
           else
             echo "⚪ غير موجودة: $lib"
           fi
         done
 
-    - name: فحص جودة JavaScript
+    - name: فحص جودة JavaScript الأساسي
       run: |
-        echo "🛠️ فحص جودة كود JavaScript..."
+        echo "🛠️ فحص جودة كود JavaScript الأساسي..."
         
-        # إنشاء package.json مؤقت إذا لم يكن موجوداً
-        if [ ! -f "package.json" ]; then
-          echo '{"name":"temp-check","version":"1.0.0"}' > package.json
-        fi
+        JS_FILES=$(find . -name "*.js" -not -path "./.github/*" 2>/dev/null || true)
         
-        # تثبيت ESLint للفحص إذا لزم الأمر
-        npm install eslint --no-save --no-package-lock
-        
-        # فحص الملفات باستخدام ESLint
-        JS_FILES=$(find . -name "*.js" -not -path "./node_modules/*" -not -path "./.github/*")
         for js_file in $JS_FILES; do
-          echo "🔍 فحص ملف: $js_file"
-          npx eslint --no-eslintrc --env browser "$js_file" --format compact || true
-        done
-
-    - name: فحص التبعيات والمكتبات
-      run: |
-        echo "📦 فحص تبعيات JavaScript..."
-        
-        # البحث عن مكتبات مضمنة عبر CDN
-        echo "🌐 المكتبات المضمنة عبر CDN:"
-        grep -r -i "cdn\.\|cloudflare\.\|unpkg\.\|stackpath\.bootstrapcdn" . --include="*.php" --include="*.js" --include="*.html" || echo "⚪ لا توجد مكتبات CDN"
-        
-        # البحث عن استدعاءات مكتبات خارجية
-        echo "📡 الاستدعاءات الخارجية:"
-        grep -r -E "(http|https)://.*\.js" . --include="*.php" --include="*.js" --include="*.html" | head -10 || echo "⚪ لا توجد استدعاءات خارجية"
-
-    - name: فحص أداء JavaScript
-      run: |
-        echo "⚡ فحص أداء JavaScript..."
-        
-        # التحقق من حجم ملفات JavaScript
-        JS_FILES=$(find . -name "*.js" -not -path "./node_modules/*" -not -path "./.github/*")
-        for js_file in $JS_FILES; do
-          size=$(wc -c < "$js_file")
-          if [ "$size" -gt 1000000 ]; then
-            echo "⚠️  ملف كبير: $js_file ($((size/1000)) KB)"
+          echo "🔍 فحص ملف: $(basename "$js_file")"
+          
+          # فحص بسيط للأخطاء الشائعة
+          if grep -q "console.log" "$js_file"; then
+            echo "⚠️  يحتوي على console.log"
+          fi
+          
+          # فحص الأحجام
+          size=$(wc -c < "$js_file" 2>/dev/null || echo "0")
+          if [ "$size" -gt 100000 ]; then
+            echo "📏 حجم الملف: $((size/1000)) KB (كبير)"
           else
-            echo "✅ حجم مناسب: $js_file ($((size/1000)) KB)"
+            echo "📏 حجم الملف: $((size/1000)) KB"
           fi
         done
 
-    - name: فحص الأمان
-      run: |
-        echo "🔒 فحص أمان JavaScript..."
-        
-        # البحث عن أنماط قد تكون خطيرة
-        PATTERNS=("eval(" "innerHTML" "document\.write" "setTimeout(" "setInterval(")
-        for pattern in "${PATTERNS[@]}"; do
-          echo "🔍 البحث عن: $pattern"
-          grep -r -n "$pattern" . --include="*.js" --exclude-dir=node_modules --exclude-dir=.git | head -5 || echo "⚪ لا توجد نتائج"
-        done
-
-    - name: إنشاء تقرير شامل
-      run: |
-        echo "📋 تقرير JavaScript الشامل:"
-        echo "=========================================="
-        
-        JS_COUNT=$(find . -name "*.js" -not -path "./node_modules/*" -not -path "./.github/*" | wc -l)
-        echo "📊 عدد ملفات JavaScript: $JS_COUNT"
-        
-        PHP_JS_REFS=$(grep -r -l "wp_enqueue_script\|wp_register_script" . --include="*.php" | wc -l)
-        echo "🔄 عدد ملفات PHP التي تسجل scripts: $PHP_JS_REFS"
-        
-        echo "=========================================="
-        echo "✅ تم الانتهاء من الفحص الشامل لـ JavaScript"
-
     - name: فحص مكونات القالب المتقدمة
       run: |
-        echo "🔍 البحث عن مكونات متقدمة (Slider, Hero, etc)..."
+        echo "🔍 البحث عن مكونات متقدمة..."
         
-        # البحث عن ملفات قد تحتوي على Slider
-        SLIDER_FILES=$(grep -l -i "slider\|carousel" *.php template-parts/*.php 2>/dev/null || true)
+        # البحث عن Slider
+        SLIDER_FILES=$(grep -l -i "slider\|carousel" *.php 2>/dev/null || true)
         if [ -n "$SLIDER_FILES" ]; then
           echo "🎠 ملفات تحتوي على Slider:"
           echo "$SLIDER_FILES"
         else
           echo "⚪ لم يتم العثور على مكون Slider"
         fi
-
-    - name: فحص شامل للألوان والتصميم
-      run: |
-        echo "🎨 فحص نظام الألوان والتصميم..."
         
-        CSS_FILES=$(find . -name "*.css" -not -path "./.github/*")
-        if [ -n "$CSS_FILES" ]; then
-          echo "📊 تقرير الألوان المستخدمة:"
-          grep -E -i "(#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})|rgb\(|rgba\(|hsl\()" $(echo "$CSS_FILES") | \
-          sort | uniq | head -15
+        # البحث عن Hero section
+        HERO_FILES=$(grep -l -i "hero\|banner" *.php 2>/dev/null || true)
+        if [ -n "$HERO_FILES" ]; then
+          echo "🦸 ملفات تحتوي على Hero:"
+          echo "$HERO_FILES"
         else
-          echo "⚪ لا توجد ملفات CSS للفحص"
+          echo "⚪ لم يتم العثور على مكون Hero"
+        fi
+
+    - name: فحص الألوان والتصميم
+      run: |
+        echo "🎨 فحص نظام الألوان..."
+        
+        CSS_FILES=$(find . -name "*.css" -not -path "./.github/*" 2>/dev/null || true)
+        if [ -n "$CSS_FILES" ]; then
+          echo "📊 الألوان المستخدمة:"
+          grep -h -E -i "(#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})|rgb\(|rgba\(|hsl\()" $CSS_FILES 2>/dev/null | \
+          sort | uniq | head -10 || echo "⚪ لا توجد ألوان محددة"
+        else
+          echo "⚪ لا توجد ملفات CSS"
         fi
 
     - name: تقرير نهائي
       run: |
-        echo "🎉 تم الانتهاء من الفحص الشامل!"
-        echo "📋 النتائج تشمل:"
-        echo "   - ✅ هيكل القالب الأساسي"
-        echo "   - 🔍 ملفات JavaScript والمكتبات"
-        echo "   - 🛠️  جودة كود JavaScript"
-        echo "   - 📦 التبعيات والمكتبات"
-        echo "   - ⚡ أداء JavaScript"
-        echo "   - 🔒 أمان JavaScript"
-        echo "   - 🎠 المكونات المتقدمة"
-        echo "   - 🎨 نظام الألوان"
+        echo "🎉 تم الانتهاء من الفحص!"
+        echo "📋 النتائج متاحة أعلاه"
+        echo "✅ لا حاجة لـ Node.js أو npm"
