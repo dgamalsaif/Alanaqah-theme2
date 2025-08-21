@@ -1,3 +1,4 @@
+```php name=template-parts/single/product-info.php
 <?php
 /**
  * The template part for displaying the product info on the single product page.
@@ -21,3 +22,4 @@
     do_action( 'woocommerce_single_product_summary' );
     ?>
 </div>
+```

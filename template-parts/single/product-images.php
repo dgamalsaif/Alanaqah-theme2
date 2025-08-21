@@ -1,3 +1,4 @@
+```php name=template-parts/single/product-images.php
 <?php
 /**
  * The template part for displaying the product images on the single product page.
@@ -16,3 +17,4 @@
     do_action( 'woocommerce_before_single_product_summary' );
     ?>
 </div>
+```
