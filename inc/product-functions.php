@@ -1,4 +1,5 @@
- <?php
+```php name=inc/product-functions.php
+<?php
 /**
  * WooCommerce Compatibility Functions for Alam Al Anika Theme.
  *
@@ -38,7 +39,6 @@ remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wr
 remove_action( 'woocommerce_after_main_content', 'woocommerce_output_content_wrapper_end', 10 );
 remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
 
-
 // =========================================================================
 // SWATCHES FUNCTIONALITY - FINAL CORRECTED CODE
 // =========================================================================
@@ -58,7 +58,6 @@ if ( ! function_exists( 'alam_al_anika_add_color_field_to_add_form' ) ) {
     }
 }
 add_action( 'pa_color_add_form_fields', 'alam_al_anika_add_color_field_to_add_form' );
-
 
 /**
  * 2. Add color picker field to the "Edit Color Term" screen.
@@ -91,7 +90,6 @@ if ( ! function_exists( 'alam_al_anika_save_term_color' ) ) {
 add_action( 'created_pa_color', 'alam_al_anika_save_term_color' );
 add_action( 'edited_pa_color', 'alam_al_anika_save_term_color' );
 
-
 /**
  * 4. Enqueue the WordPress color picker script and styles on the correct admin pages.
  */
@@ -117,7 +115,6 @@ if ( ! function_exists( 'alam_al_anika_init_color_picker_js' ) ) {
         <?php
     }
 }
-
 
 /**
  * 6. Override the default WooCommerce dropdown for the 'color' attribute on the front-end.
@@ -162,14 +159,12 @@ if ( ! function_exists( 'alam_al_anika_variation_swatches' ) ) {
 }
 add_filter( 'woocommerce_dropdown_variation_attributes', 'alam_al_anika_variation_swatches', 100, 2 );
 
-
 /**
  * 7. Add a body class to hide the default dropdown when swatches are active.
  */
 if ( ! function_exists( 'alam_al_anika_add_body_class_for_swatches' ) ) {
     function alam_al_anika_add_body_class_for_swatches( $classes ) {
         global $product;
-        // THIS IS THE FIX: Check if we are on a product page AND if $product is a valid object.
         if ( is_product() && is_a( $product, 'WC_Product' ) && $product->is_type( 'variable' ) ) {
             $attributes = $product->get_variation_attributes();
             if ( isset( $attributes['pa_color'] ) ) {
@@ -180,3 +175,4 @@ if ( ! function_exists( 'alam_al_anika_add_body_class_for_swatches' ) ) {
     }
 }
 add_filter( 'body_class', 'alam_al_anika_add_body_class_for_swatches' );
+```
