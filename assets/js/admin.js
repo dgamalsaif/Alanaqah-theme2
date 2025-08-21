@@ -1,3 +1,4 @@
+```javascript name=assets/js/admin.js
 /**
  * JavaScript for the admin area.
  *
@@ -12,3 +13,4 @@
     });
 
 })(jQuery);
+```

@@ -1,3 +1,4 @@
+```javascript name=assets/js/main.js
 (function($) {
     "use strict";
 
@@ -39,7 +40,6 @@
         }
         initSwatches();
 
-
         // --- Back to Top Button ---
         const backToTopBtn = $('#back-to-top');
         $(window).on('scroll', function() {
@@ -57,5 +57,21 @@
         });
 
     });
-
+    $('.variations_form').on('click','.size-swatch',function(e){
+    e.preventDefault();
+    var value = $(this).data('value');
+    var $select = $('select[name="attribute_pa_size"]');
+    if($select.length) {
+        $select.val(value).trigger('change');
+        $(this).siblings('.size-swatch').removeClass('selected');
+        $(this).addClass('selected');
+    }
+});
+$(document.body).on('added_to_cart', function(event, btn) {
+    var msg = $(btn).closest('.product-card').find('.woocommerce-loop-product__title').text() || 'تمت إضافة المنتج للسلة!';
+    var $note = $('#notification');
+    $note.text(msg).addClass('show');
+    setTimeout(function(){ $note.removeClass('show'); }, 2600);
+});
 })(jQuery);
+
