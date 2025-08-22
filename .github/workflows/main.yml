@@ -33,7 +33,6 @@ jobs:
           # تهيئة ملف composer.json
           composer init --quiet --no-interaction --name="alam-al-anika/ci-tools" --description="Tools for CI"
 
-          # ====> السطر الجديد الذي تم إضافته لحل المشكلة <====
           # السماح لإضافة Composer بالعمل (مطلوب في الإصدارات الحديثة)
           composer config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
           
@@ -43,5 +42,6 @@ jobs:
       # الخطوة 4: تشغيل أداة فحص جودة الكود
       - name: 'Run PHP_CodeSniffer'
         run: |
-          # الآن سيعمل الأمر مباشرة لأن Composer قام بكل الإعدادات
-          phpcs . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/js/vendor/*
+          # ====> هذا هو السطر الذي تم تعديله لحل المشكلة <====
+          # تشغيل الأداة من المسار المحلي للمشروع لضمان استخدام الإعدادات الصحيحة
+          ./vendor/bin/phpcs . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/js/vendor/*
