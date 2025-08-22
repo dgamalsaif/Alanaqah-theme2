@@ -17,7 +17,6 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v4
         with:
-          # نحتاج للـ token لنتمكن من حفظ التعديلات
           token: ${{ secrets.GITHUB_TOKEN }}
 
       # الخطوة 2: إعداد بيئة عمل PHP مع الأدوات المطلوبة
@@ -36,8 +35,11 @@ jobs:
 
       # الخطوة 4: تشغيل أداة الإصلاح التلقائي
       - name: 'Run Auto-Fixer (phpcbf)'
+        # ====> هذا هو التعديل الأخير <====
+        # تجاهل كود الخروج الخاص بالأداة للسماح بإكمال الخطوات
+        continue-on-error: true
         run: |
-          ./vendor/bin/phpcbf . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/js/vendor/*
+          ./vendor/bin/phpcbf . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/js/*
 
       # الخطوة 5: حفظ التعديلات تلقائيًا في المستودع
       - name: 'Commit changes'
