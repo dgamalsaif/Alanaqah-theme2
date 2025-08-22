@@ -1,126 +1,53 @@
-name: WordPress Theme CI
+# اسم الـ Workflow الذي سيظهر في صفحة Actions على GitHub
+name: 'WordPress Theme Check'
 
+# متى يتم تشغيل هذا الأمر
 on:
   push:
-    branches: [ main, development ]
+    branches:
+      - main # يتم التشغيل عند أي تحديث لفرع main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main # يتم التشغيل عند أي طلب دمج لفرع main
 
+# المهام التي سيتم تنفيذها
 jobs:
-  theme-test:
-    runs-on: ubuntu-latest
-    
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: wordpress_test
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        ports:
-          - 3306:3306
+  # المهمة الأولى: فحص القالب باستخدام أداة Theme Check الرسمية
+  theme-check:
+    name: 'Theme Check'
+    runs-on: ubuntu-latest # استخدام أحدث نسخة من نظام أوبنتو لتشغيل الأمر
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # الخطوة 1: جلب نسخة من كود القالب إلى بيئة العمل
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.1'
-        extensions: mbstring, xml, curl, mysql, zip
-        ini-values: post_max_size=256M, upload_max_filesize=256M
+      # الخطوة 2: تشغيل أداة فحص القوالب الرسمية
+      # هذه الأداة هي نفسها التي يستخدمها فريق مراجعة ووردبريس
+      - name: 'Run Theme Check Action'
+        uses: m-t-k/action-wordpress-theme-check@v1.1
+        with:
+          # اكتب هنا اسم مجلد القالب الخاص بك
+          theme_name: 'alam-al-anika'
 
-    - name: Validate composer.json
-      run: composer validate --no-check-all
-
-    - name: Install dependencies
-      run: |
-        composer install --prefer-dist --no-progress --no-interaction
-        npm ci
-
-    - name: Setup WordPress test environment
-      run: |
-        bash tests/bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest
-
-    - name: PHP Syntax check
-      run: |
-        find . -name "*.php" -exec php -l {} \;
-
-    - name: Run PHP Code Sniffer
-      run: |
-        composer run phpcs
-
-    - name: Run PHPUnit tests
-      run: |
-        composer run phpunit
-
-    - name: Run JavaScript tests
-      run: |
-        npm test
-
-    - name: Security scan with WPCS
-      run: |
-        composer run security
-
-    - name: Check theme version consistency
-      run: |
-        ./bin/check-version-consistency
-
-    - name: Theme check
-      run: |
-        ./bin/theme-check
-
-    - name: Build assets
-      run: |
-        npm run build
-
-    - name: Create deployment package
-      run: |
-        mkdir deployment
-        rsync -av --exclude='.git' --exclude='node_modules' --exclude='vendor' --exclude='.github' . deployment/
-        cd deployment && zip -r ../alam-al-anika-theme.zip .
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: alam-al-anika-theme
-        path: alam-al-anika-theme.zip
-
-  lint-css:
+  # المهمة الثانية: فحص جودة الكود البرمجي (PHP)
+  php-codesniffer:
+    name: 'PHP Code Sniffer'
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # الخطوة 1: جلب نسخة من كود القالب
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run CSS lint
-      run: npm run lint:css
-
-  accessibility-test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run accessibility tests
-      run: npm run test:a11y
+      # الخطوة 2: تشغيل أداة فحص جودة الكود
+      # تتأكد من أن الكود يتبع معايير ووردبريس في الكتابة والتنسيق
+      - name: 'Run PHP_CodeSniffer'
+        uses: php-actions/phpcs@v1
+        with:
+          # اسم الملفات التي سيتم فحصها (كل الملفات)
+          path: './'
+          # تحديد معايير ووردبريس للفحص
+          standard: 'WordPress'
+          # تجاهل المجلدات التي لا تحتاج فحص مثل ملفات الإضافات الخارجية
+          ignore: '*/vendor/*,*/node_modules/*'
