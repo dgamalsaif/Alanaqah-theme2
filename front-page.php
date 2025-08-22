@@ -17,30 +17,40 @@ get_header();
      * Each file will contain the specific markup and logic for its section.
      */
     
-    // Hero Slider Section
+    // Hero Slider Section (No animation needed as it's the first thing seen)
     get_template_part( 'template-parts/homepage/hero-section' );
-
-    // Category Navigation Section
-    get_template_part( 'template-parts/homepage/category-nav' );
-
-    // Flash Sale Products Section
-    if ( class_exists( 'WooCommerce' ) ) {
-        get_template_part( 'template-parts/homepage/flash-sale' );
-    }
-
-    // Super Deals Products Section
-    if ( class_exists( 'WooCommerce' ) ) {
-        get_template_part( 'template-parts/homepage/super-deals' );
-    }
-    
-    // Picks For You Section
-    if ( class_exists( 'WooCommerce' ) ) {
-        get_template_part( 'template-parts/homepage/picks-for-you' );
-    }
-
     ?>
 
-</main><!-- #main -->
+    <div class="animate-on-scroll">
+        <?php
+        // Category Navigation Section
+        get_template_part( 'template-parts/homepage/category-nav' );
+        ?>
+    </div>
 
-<?php
+    <?php
+    // Flash Sale Products Section
+    if ( class_exists( 'WooCommerce' ) ) : ?>
+        <div class="animate-on-scroll">
+            <?php get_template_part( 'template-parts/homepage/flash-sale' ); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php
+    // Super Deals Products Section
+    if ( class_exists( 'WooCommerce' ) ) : ?>
+        <div class="animate-on-scroll">
+            <?php get_template_part( 'template-parts/homepage/super-deals' ); ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php
+    // Picks For You Section
+    if ( class_exists( 'WooCommerce' ) ) : ?>
+        <div class="animate-on-scroll">
+            <?php get_template_part( 'template-parts/homepage/picks-for-you' ); ?>
+        </div>
+    <?php endif; ?>
+
+</main><?php
 get_footer();

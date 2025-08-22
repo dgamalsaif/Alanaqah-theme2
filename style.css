@@ -701,3 +701,65 @@ body {
     text-align: center;
     color: var(--text-light);
 }
+/* ==================================
+   Advanced Product Gallery Styles
+   ================================== */
+
+/* اجعل الحاوية الرئيسية للمعرض تستخدم Flexbox */
+.woocommerce div.product div.images.woocommerce-product-gallery {
+    display: flex;
+    flex-direction: row-reverse; /* لعكس الترتيب وإظهار الصور المصغرة على اليمين */
+}
+
+/* اجعل الصور المصغرة (flex-control-nav) تأخذ مساحة ثابتة وتترتب عمودياً */
+.woocommerce div.product div.images .flex-control-nav {
+    order: 2; /* تغيير الترتيب */
+    flex: 0 0 100px; /* لا تنمو، لا تتقلص، عرض أساسي 100 بكسل */
+    flex-direction: column;
+    margin: 0 0 0 10px; /* هامش على اليسار */
+    padding: 0;
+}
+
+.woocommerce div.product div.images .flex-control-nav li {
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+/* اجعل حاوية الصورة الرئيسية تملأ المساحة المتبقية */
+.woocommerce div.product div.images .woocommerce-product-gallery__wrapper {
+    order: 1; /* تغيير الترتيب */
+    flex: 1; /* اسمح لها بالنمو لملء المساحة */
+    margin: 0;
+}
+/* ==================================
+   Micro-interactions & Animations
+   ================================== */
+
+/* تحسين تأثير تمرير الفأرة على المنتجات في الأرشيف */
+.woocommerce ul.products li.product {
+    /* ... التنسيقات الحالية ... */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* أضف box-shadow إلى الانتقال */
+}
+.woocommerce ul.products li.product:hover {
+    transform: translateY(-8px); /* زيادة المسافة قليلاً */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1); /* إضافة ظل احترافي */
+}
+
+/* تأثير احترافي للأزرار الرئيسية */
+.button, .hero-btn {
+    transition: all 0.3s ease;
+}
+.button:hover, .hero-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+/* Animation on Scroll Styles */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
