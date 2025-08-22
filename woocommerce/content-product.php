@@ -4,12 +4,6 @@
  *
  * This template can be overridden by copying it to yourtheme/woocommerce/content-product.php.
  *
- * HOWEVER, on occasion WooCommerce will need to update template files and you
- * (the theme developer) will need to copy the new files to your theme to
- * maintain compatibility. We try to do this as little as possible, but it does
- * happen. When this occurs the version of the template file will be bumped and
- * the readme will list any important changes.
- *
  * @see     https://woo.com/document/template-structure/
  * @package WooCommerce\Templates
  * @version 3.6.0
@@ -24,7 +18,7 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	return;
 }
 ?>
-<li <?php wc_product_class( '', $product ); ?>>
+<li <?php wc_product_class( 'animate-on-scroll', $product ); ?>>
 	<?php
 	/**
 	 * Hook: woocommerce_before_shop_loop_item.
@@ -55,6 +49,9 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	 * @hooked woocommerce_template_loop_price - 10
 	 */
 	do_action( 'woocommerce_after_shop_loop_item_title' );
+    
+    // Quick View Button
+    echo '<button class="quick-view-btn" data-product-id="' . esc_attr( get_the_ID() ) . '">' . esc_html__( 'Quick View', 'alam-al-anika' ) . '</button>';
 
 	/**
 	 * Hook: woocommerce_after_shop_loop_item.
@@ -62,18 +59,6 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	 * @hooked woocommerce_template_loop_product_link_close - 5
 	 * @hooked woocommerce_template_loop_add_to_cart - 10
 	 */
-
-    // =================================================================
-    // START: الكود الذي تمت إضافته
-    // =================================================================
-    
-    // تمت إضافة زر "نظرة سريعة" هنا
-    echo '<button class="quick-view-btn" data-product-id="' . get_the_ID() . '">نظرة سريعة</button>';
-
-    // =================================================================
-    // END: الكود الذي تمت إضافته
-    // =================================================================
-
 	do_action( 'woocommerce_after_shop_loop_item' );
 	?>
 </li>

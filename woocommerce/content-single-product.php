@@ -1,4 +1,4 @@
- <?php
+<?php
 /**
  * The template for displaying single product content.
  * This file now loads modular template parts.
@@ -33,10 +33,12 @@ if ( post_password_required() ) {
         ?>
 	</div>
 
-    <?php
-    // Load the related products and tabs part
-    get_template_part('template-parts/single/related-products');
-    ?>
+    <div class="animate-on-scroll">
+        <?php
+        // Load the related products and tabs part
+        get_template_part('template-parts/single/related-products');
+        ?>
+    </div>
 </div>
 
 <?php do_action( 'woocommerce_after_single_product' ); ?>
