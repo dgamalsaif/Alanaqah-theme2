@@ -34,7 +34,6 @@
 </div><!-- #page -->
 
 <?php wp_footer(); ?>
-<?php wp_footer(); ?>
 
 <div id="quick-view-modal-wrapper" class="modal-wrapper" style="display:none;">
     <div class="modal-overlay"></div>
