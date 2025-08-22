@@ -1,42 +1,40 @@
 <?php
 /**
- * The template for displaying the "Picks For You" section on the homepage.
- *
- * This section displays the most recent products.
+ * Template part for displaying the picks for you section on the homepage.
  *
  * @package AlamAlAnika
  */
 
-$recent_products_args = array(
-    'post_type'      => 'product',
-    'posts_per_page' => 4, // You can change the number of products to show
-    'orderby'        => 'date',
-    'order'          => 'DESC',
+$args = array(
+	'post_type'      => 'product',
+	'posts_per_page' => 4,
+	'orderby'        => 'rand', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_orderby
 );
 
-$recent_products_query = new WP_Query( $recent_products_args );
-
-if ( $recent_products_query->have_posts() ) :
+$query = new WP_Query( $args );
 ?>
-<section class="section">
-    <div class="section-header">
-        <h2 class="section-title"><?php esc_html_e( 'مختارات لك', 'alam-al-anika' ); ?></h2>
-        <a href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>" class="view-all">
-            <?php esc_html_e( 'عرض الكل', 'alam-al-anika' ); ?> <i class="fas fa-chevron-left"></i>
-        </a>
-    </div>
 
-    <div class="product-grid">
-        <?php
-        echo '<ul class="products columns-4">';
-        while ( $recent_products_query->have_posts() ) :
-            $recent_products_query->the_post();
-            wc_get_template_part( 'content', 'product' );
-        endwhile;
-        echo '</ul>';
-        ?>
-    </div>
+<section class="section picks-for-you">
+	<div class="section-header">
+		<h2 class="section-title"><?php esc_html_e( 'Picks For You', 'alam-al-anika' ); ?></h2>
+	</div>
+	<?php if ( $query->have_posts() ) : ?>
+		<ul class="products">
+			<?php
+			while ( $query->have_posts() ) :
+				$query->the_post();
+				global $product;
+				?>
+				<li class="product">
+					<a href="<?php echo esc_url( get_the_permalink() ); ?>">
+						<?php echo wp_kses_post( $product->get_image() ); ?>
+						<h2 class="woocommerce-loop-product__title"><?php echo esc_html( get_the_title() ); ?></h2>
+						<span class="price"><?php echo wp_kses_post( $product->get_price_html() ); ?></span>
+					</a>
+					<?php woocommerce_template_loop_add_to_cart(); ?>
+				</li>
+			<?php endwhile; ?>
+		</ul>
+	<?php endif; ?>
+	<?php wp_reset_postdata(); ?>
 </section>
-<?php
-endif;
-wp_reset_postdata();
