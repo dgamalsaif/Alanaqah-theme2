@@ -1,0 +1,53 @@
+# اسم الـ Workflow الذي سيظهر في صفحة Actions على GitHub
+name: 'WordPress Theme Check'
+
+# متى يتم تشغيل هذا الأمر
+on:
+  push:
+    branches:
+      - main # يتم التشغيل عند أي تحديث لفرع main
+  pull_request:
+    branches:
+      - main # يتم التشغيل عند أي طلب دمج لفرع main
+
+# المهام التي سيتم تنفيذها
+jobs:
+  # المهمة الأولى: فحص القالب باستخدام أداة Theme Check الرسمية
+  theme-check:
+    name: 'Theme Check'
+    runs-on: ubuntu-latest # استخدام أحدث نسخة من نظام أوبنتو لتشغيل الأمر
+
+    steps:
+      # الخطوة 1: جلب نسخة من كود القالب إلى بيئة العمل
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      # الخطوة 2: تشغيل أداة فحص القوالب الرسمية
+      # هذه الأداة هي نفسها التي يستخدمها فريق مراجعة ووردبريس
+      - name: 'Run Theme Check Action'
+        uses: m-t-k/action-wordpress-theme-check@v1.1
+        with:
+          # اكتب هنا اسم مجلد القالب الخاص بك
+          theme_name: 'alam-al-anika'
+
+  # المهمة الثانية: فحص جودة الكود البرمجي (PHP)
+  php-codesniffer:
+    name: 'PHP Code Sniffer'
+    runs-on: ubuntu-latest
+
+    steps:
+      # الخطوة 1: جلب نسخة من كود القالب
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      # الخطوة 2: تشغيل أداة فحص جودة الكود
+      # تتأكد من أن الكود يتبع معايير ووردبريس في الكتابة والتنسيق
+      - name: 'Run PHP_CodeSniffer'
+        uses: php-actions/phpcs@v1
+        with:
+          # اسم الملفات التي سيتم فحصها (كل الملفات)
+          path: './'
+          # تحديد معايير ووردبريس للفحص
+          standard: 'WordPress'
+          # تجاهل المجلدات التي لا تحتاج فحص مثل ملفات الإضافات الخارجية
+          ignore: '*/vendor/*,*/node_modules/*'
