@@ -171,4 +171,30 @@ $(document).on('click', function(e) {
         resultsContainer.hide();
     }
 });
+// ... الكود السابق
+
+// Animation on Scroll - Intersection Observer
+jQuery(document).ready(function($) {
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+
+    if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        animatedElements.forEach(el => {
+            observer.observe(el);
+        });
+    } else {
+        // Fallback for older browsers
+        animatedElements.forEach(el => {
+            el.classList.add('is-visible');
+        });
+    }
+});
 })(jQuery);
