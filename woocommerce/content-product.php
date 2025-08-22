@@ -2,9 +2,7 @@
 /**
  * The template for displaying product content within loops
  *
- * This template can be overridden by copying it to yourtheme/woocommerce/content-product.php.
- *
- * @see     https://woo.com/document/template-structure/
+ * @see     https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates
  * @version 3.6.0
  */
@@ -18,7 +16,7 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	return;
 }
 ?>
-<li <?php wc_product_class( 'animate-on-scroll', $product ); ?>>
+<li <?php wc_product_class( '', $product ); ?>>
 	<?php
 	/**
 	 * Hook: woocommerce_before_shop_loop_item.
@@ -49,9 +47,6 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	 * @hooked woocommerce_template_loop_price - 10
 	 */
 	do_action( 'woocommerce_after_shop_loop_item_title' );
-    
-    // Quick View Button
-    echo '<button class="quick-view-btn" data-product-id="' . esc_attr( get_the_ID() ) . '">' . esc_html__( 'Quick View', 'alam-al-anika' ) . '</button>';
 
 	/**
 	 * Hook: woocommerce_after_shop_loop_item.
