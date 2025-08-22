@@ -34,6 +34,16 @@
 </div><!-- #page -->
 
 <?php wp_footer(); ?>
+<?php wp_footer(); ?>
+
+<div id="quick-view-modal-wrapper" class="modal-wrapper" style="display:none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <button class="modal-close">X</button>
+        <div id="quick-view-content">
+            </div>
+    </div>
+</div>
 
 </body>
 </html>

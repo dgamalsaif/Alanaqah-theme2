@@ -1,4 +1,4 @@
- <?php
+<?php
 /**
  * The header for our theme.
  *
@@ -34,16 +34,32 @@
                 }
                 ?>
             </div>
+            
+            <?php // =================================================================
+            // START: الكود الذي تم تعديله
+            // ================================================================= ?>
             <div class="search-container">
-                <?php get_search_form(); ?>
+                <form role="search" method="get" class="search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+                    <input type="search" class="search-field" placeholder="<?php echo esc_attr_x( 'Search products…', 'placeholder', 'alam-al-anika' ); ?>" value="<?php echo get_search_query(); ?>" name="s" />
+                    <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>
+                    <input type="hidden" name="post_type" value="product" />
+                    
+                    <?php // --- START: الكود المضاف --- ?>
+                    <div id="live-search-results"></div>
+                    <?php // --- END: الكود المضاف --- ?>
+
+                </form>
             </div>
+            <?php // =================================================================
+            // END: الكود الذي تم تعديله
+            // ================================================================= ?>
+
             <div class="user-actions">
                 <?php if ( class_exists( 'WooCommerce' ) ) : ?>
                     <a href="<?php echo esc_url( get_permalink( get_option('woocommerce_myaccount_page_id') ) ); ?>" title="<?php esc_attr_e( 'My Account', 'alam-al-anika' ); ?>">
                         <i class="far fa-user"></i>
                         <span><?php esc_html_e( 'حسابي', 'alam-al-anika' ); ?></span>
                     </a>
-                    <!-- Note: Wishlist functionality requires a plugin like YITH WooCommerce Wishlist -->
                     <a href="#" class="wishlist-link" title="<?php esc_attr_e( 'Wishlist', 'alam-al-anika' ); ?>">
                         <i class="far fa-heart"></i>
                         <span><?php esc_html_e( 'المفضلة', 'alam-al-anika' ); ?></span>
@@ -66,7 +82,4 @@
                 )
             );
             ?>
-        </nav><!-- #site-navigation -->
-	</header><!-- #masthead -->
-
-	<div id="content" class="site-content">
+        </nav></header><div id="content" class="site-content">
