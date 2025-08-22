@@ -30,6 +30,10 @@ jobs:
       # الخطوة 3: تثبيت معايير ووردبريس بالطريقة الصحيحة عبر Composer
       - name: 'Install WordPress Coding Standards via Composer'
         run: |
+          # ====> السطر الجديد الذي تم إضافته لحل المشكلة <====
+          # السماح للإضافة الضرورية بالعمل
+          composer config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+
           # هذا الأمر سيقوم بتثبيت المعايير وتهيئتها تلقائيًا
           composer require --dev wp-coding-standards/wpcs dealerdirect/phpcodesniffer-composer-installer
 
