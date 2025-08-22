@@ -1,52 +1,45 @@
 <?php
 /**
- * The template for displaying the super deals section on the homepage.
- *
- * This section displays featured products.
+ * Template part for displaying the super deals section on the homepage.
  *
  * @package AlamAlAnika
  */
 
-$featured_products_args = array(
-    'post_type'      => 'product',
-    'posts_per_page' => 4, // You can change the number of products to show
-    'tax_query'      => array(
-        array(
-            'taxonomy' => 'product_visibility',
-            'field'    => 'name',
-            'terms'    => 'featured',
-        ),
-    ),
+$args = array(
+	'post_type'      => 'product',
+	'posts_per_page' => 4,
+	'meta_key'       => '_sale_price', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+	'meta_value'     => '0',
+	'meta_compare'   => '>',
 );
 
-$featured_products_query = new WP_Query( $featured_products_args );
-
-if ( $featured_products_query->have_posts() ) :
+$query = new WP_Query( $args );
 ?>
-<section class="super-deals section">
-    <div class="deals-header">
-        <div>
-            <h2 class="deals-title"><?php esc_html_e( 'صفقات مميزة', 'alam-al-anika' ); ?></h2>
-            <p class="deals-subtitle"><?php esc_html_e( 'عروض لفترة محدودة', 'alam-al-anika' ); ?></p>
-        </div>
-        <div class="deals-timer">
-            <i class="far fa-clock"></i>
-            <span id="deals-timer"><?php esc_html_e( 'ينتهي خلال: 02:34:56', 'alam-al-anika' ); ?></span>
-        </div>
-    </div>
 
-    <div class="product-grid">
-        <?php
-        echo '<ul class="products columns-4">';
-        while ( $featured_products_query->have_posts() ) :
-            $featured_products_query->the_post();
-            wc_get_template_part( 'content', 'product' );
-        endwhile;
-        echo '</ul>';
-        ?>
-    </div>
-    <!-- Note: Pagination for a homepage section is optional. You can add it if needed. -->
+<section class="section super-deals">
+	<div class="section-header">
+		<h2 class="section-title"><?php esc_html_e( 'Super Deals', 'alam-al-anika' ); ?></h2>
+		<a href="#" class="view-all"><?php esc_html_e( 'View All', 'alam-al-anika' ); ?> <i class="fas fa-chevron-left"></i></a>
+	</div>
+	<?php if ( $query->have_posts() ) : ?>
+		<ul class="products">
+			<?php
+			while ( $query->have_posts() ) :
+				$query->the_post();
+				global $product;
+				?>
+				<li class="product">
+					<a href="<?php echo esc_url( get_the_permalink() ); ?>">
+						<?php echo wp_kses_post( $product->get_image() ); ?>
+						<h2 class="woocommerce-loop-product__title"><?php echo esc_html( get_the_title() ); ?></h2>
+						<span class="price"><?php echo wp_kses_post( $product->get_price_html() ); ?></span>
+					</a>
+					<?php woocommerce_template_loop_add_to_cart(); ?>
+				</li>
+			<?php endwhile; ?>
+		</ul>
+	<?php else : ?>
+		<p><?php esc_html_e( 'No deals available at the moment.', 'alam-al-anika' ); ?></p>
+	<?php endif; ?>
+	<?php wp_reset_postdata(); ?>
 </section>
-<?php
-endif;
-wp_reset_postdata();
