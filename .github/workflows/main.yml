@@ -1,4 +1,4 @@
- # اسم الـ Workflow الذي سيظهر في صفحة Actions على GitHub
+# اسم الـ Workflow الذي سيظهر في صفحة Actions على GitHub
 name: 'WordPress Theme Quality Check'
 
 # متى يتم تشغيل هذا الأمر
@@ -61,8 +61,9 @@ jobs:
       # الخطوة 3: تثبيت معايير ووردبريس لأداة الفحص
       - name: 'Install WordPress Coding Standards'
         run: |
-          # استنساخ مستودع معايير ووردبريس الرسمي
-          git clone -b master https://github.com/WordPress/WordPress-Coding-Standards.git wpcs
+          # ---== السطر الذي تم تعديله ==---
+          # استنساخ مستودع معايير ووردبريس الرسمي من فرع main
+          git clone -b main https://github.com/WordPress/WordPress-Coding-Standards.git wpcs
           # تسجيل مسار المعايير في إعدادات phpcs
           phpcs --config-set installed_paths "$(pwd)/wpcs"
 
