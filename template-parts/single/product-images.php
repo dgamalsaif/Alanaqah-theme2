@@ -1,20 +1,22 @@
-```php name=template-parts/single/product-images.php
 <?php
 /**
- * The template part for displaying the product images on the single product page.
+ * Template part for displaying single product images.
  *
  * @package AlamAlAnika
  */
+
 ?>
-<div class="product-images-section">
-    <?php
-    /**
-     * Hook: woocommerce_before_single_product_summary.
-     *
-     * @hooked woocommerce_show_product_sale_flash - 10
-     * @hooked woocommerce_show_product_images - 20
-     */
-    do_action( 'woocommerce_before_single_product_summary' );
-    ?>
+<div class="product-images">
+	<div class="main-image">
+		<?php
+		if ( has_post_thumbnail() ) {
+			the_post_thumbnail( 'large' );
+		}
+		?>
+	</div>
+	<div class="product-thumbnails">
+		<?php
+		// Gallery images would be handled here, typically by a WooCommerce hook or a custom function.
+		?>
+	</div>
 </div>
-```
