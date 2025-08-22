@@ -1,4 +1,4 @@
-# اسم الـ Workflow الذي سيظهر في صفحة Actions على GitHub
+ # اسم الـ Workflow الذي سيظهر في صفحة Actions على GitHub
 name: 'WordPress Theme Quality Check'
 
 # متى يتم تشغيل هذا الأمر
