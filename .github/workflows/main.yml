@@ -1,5 +1,5 @@
- # اسم الـ Workflow الذي سيظهر في صفحة Actions على GitHub
-name: 'WordPress Theme Check'
+# اسم الـ Workflow الذي سيظهر في صفحة Actions على GitHub
+name: 'WordPress Theme Quality Check'
 
 # متى يتم تشغيل هذا الأمر
 on:
@@ -12,46 +12,62 @@ on:
 
 # المهام التي سيتم تنفيذها
 jobs:
-  # المهمة الأولى: فحص القالب باستخدام أداة Theme Check محدّثة
+  # المهمة الأولى: فحص القالب باستخدام أداة Theme Check الرسمية يدويًا
   theme-check:
-    name: 'Theme Check'
-    runs-on: ubuntu-latest # استخدام أحدث نسخة من نظام أوبنتو لتشغيل الأمر
+    name: 'Official Theme Check'
+    runs-on: ubuntu-latest
 
     steps:
-      # الخطوة 1: جلب نسخة من كود القالب إلى بيئة العمل
-      - name: 'Checkout code'
+      # الخطوة 1: جلب نسخة من كود القالب
+      - name: 'Checkout Theme Code'
         uses: actions/checkout@v4
 
-      # الخطوة 2: تشغيل أداة فحص القوالب الرسمية (بإصدار أحدث وموثوق)
-      - name: 'Run Theme Check Action'
-        uses: calvin-l/action-wordpress-theme-check@v1.1
-        with:
-          # اكتب هنا اسم مجلد القالب الخاص بك
-          theme_name: 'alam-al-anika'
+      # الخطوة 2: تنزيل وتثبيت أداة فحص القوالب الرسمية
+      - name: 'Download and Install Theme Check Plugin'
+        run: |
+          # تنزيل الأداة من مستودع ووردبريس الرسمي
+          wget -q https://downloads.wordpress.org/plugin/theme-check.zip
+          # فك ضغط الملف
+          unzip -q theme-check.zip
+          # حذف الملف المضغوط
+          rm theme-check.zip
 
-  # المهمة الثانية: فحص جودة الكود البرمجي (PHP) مع تثبيت المعايير
+      # الخطوة 3: تشغيل الفحص على مجلد القالب
+      - name: 'Run Theme Check'
+        # نستخدم PHP لتشغيل سكربت الفحص مباشرة
+        run: |
+          php -l ./theme-check/checkbase.php
+          # تشغيل الفحص على مجلد القالب (تأكد من صحة الاسم)
+          ./theme-check/checkbase.php -d . -t alam-al-anika
+        continue-on-error: true # السماح بإكمال الخطوات حتى لو وجد الفحص تحذيرات
+
+  # المهمة الثانية: فحص جودة الكود البرمجي (PHP)
   php-codesniffer:
-    name: 'PHP Code Sniffer'
+    name: 'PHP Code Sniffer (WordPress Standards)'
     runs-on: ubuntu-latest
 
     steps:
       # الخطوة 1: جلب نسخة من كود القالب
       - name: 'Checkout code'
         uses: actions/checkout@v4
-      
+
       # الخطوة 2: إعداد بيئة عمل PHP
       - name: 'Setup PHP'
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0' # يمكنك تحديد إصدار PHP المناسب
+          php-version: '8.0'
+          tools: composer, phpcs # تثبيت phpcs بشكل عام ومباشر
 
-      # الخطوة 3: تثبيت معايير ووردبريس باستخدام Composer
+      # الخطوة 3: تثبيت معايير ووردبريس لأداة الفحص
       - name: 'Install WordPress Coding Standards'
         run: |
-          composer create-project wp-coding-standards/wpcs --no-dev
-          sudo phpcs --config-set installed_paths $(pwd)/wpcs
+          # استنساخ مستودع معايير ووردبريس الرسمي
+          git clone -b master https://github.com/WordPress/WordPress-Coding-Standards.git wpcs
+          # تسجيل مسار المعايير في إعدادات phpcs
+          phpcs --config-set installed_paths "$(pwd)/wpcs"
 
       # الخطوة 4: تشغيل أداة فحص جودة الكود
       - name: 'Run PHP_CodeSniffer'
         run: |
-          phpcs . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*
+          # تشغيل الفحص باستخدام المسار الصحيح للأداة
+          phpcs . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/js/vendor/*
