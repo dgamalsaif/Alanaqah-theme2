@@ -32,10 +32,11 @@ if ( ! function_exists( 'alam_al_anika_scripts' ) ) {
 		$suffix = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? '' : '.min';
 
 		// Main stylesheet.
-		wp_enqueue_style( 'alam-al-anika-style', get_stylesheet_uri(), array(), '1.0.0' );
+		wp_enqueue_style( 'alam-al-anika-style', get_stylesheet_uri(), array(), '1.0.1' );
 
-		// Theme's custom CSS file.
-		wp_enqueue_style( 'alam-al-anika-main-css', get_template_directory_uri() . '/assets/css/main' . $suffix . '.css', array(), '1.0.0' );
+		// Theme's custom CSS files.
+		wp_enqueue_style( 'alam-al-anika-main-css', get_template_directory_uri() . '/assets/css/main' . $suffix . '.css', array(), '1.0.1' );
+		wp_enqueue_style( 'alam-al-anika-responsive-css', get_template_directory_uri() . '/assets/css/responsive' . $suffix . '.css', array( 'alam-al-anika-main-css' ), '1.0.1' );
 
 		// Font Awesome icons.
 		wp_enqueue_style( 'font-awesome-all', get_template_directory_uri() . '/assets/fonts/font-awesome/css/all' . $suffix . '.css', array(), '5.15.4' );
@@ -66,7 +67,7 @@ if ( ! function_exists( 'alam_al_anika_scripts' ) ) {
 		}
 
 		// Main JS file.
-		wp_enqueue_script( 'alam-al-anika-main-js', get_template_directory_uri() . '/assets/js/main' . $suffix . '.js', array( 'jquery' ), '1.0.0', true );
+		wp_enqueue_script( 'alam-al-anika-main-js', get_template_directory_uri() . '/assets/js/main' . $suffix . '.js', array( 'jquery' ), '1.0.1', true );
 
 		// Pass ajax_url and nonces to main.js.
 		wp_localize_script(
@@ -93,8 +94,9 @@ if ( ! function_exists( 'alam_al_anika_admin_scripts' ) ) {
 	 * Enqueue scripts and styles for the admin area.
 	 */
 	function alam_al_anika_admin_scripts() {
-		wp_enqueue_style( 'alam-al-anika-admin-style', get_template_directory_uri() . '/assets/css/admin.css', array(), '1.0.0' );
-		wp_enqueue_script( 'alam-al-anika-admin-js', get_template_directory_uri() . '/assets/js/admin.js', array( 'jquery' ), '1.0.0', true );
+		$suffix = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? '' : '.min';
+		// Since you don't have admin.css, we only enqueue admin.js.
+		wp_enqueue_script( 'alam-al-anika-admin-js', get_template_directory_uri() . '/assets/js/admin' . $suffix . '.js', array( 'jquery' ), '1.0.1', true );
 	}
 }
 add_action( 'admin_enqueue_scripts', 'alam_al_anika_admin_scripts' );
