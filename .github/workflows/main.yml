@@ -25,21 +25,16 @@ jobs:
       # الخطوة 2: تنزيل وتثبيت أداة فحص القوالب الرسمية
       - name: 'Download and Install Theme Check Plugin'
         run: |
-          # تنزيل الأداة من مستودع ووردبريس الرسمي
           wget -q https://downloads.wordpress.org/plugin/theme-check.zip
-          # فك ضغط الملف
           unzip -q theme-check.zip
-          # حذف الملف المضغوط
           rm theme-check.zip
 
       # الخطوة 3: تشغيل الفحص على مجلد القالب
       - name: 'Run Theme Check'
-        # نستخدم PHP لتشغيل سكربت الفحص مباشرة
         run: |
           php -l ./theme-check/checkbase.php
-          # تشغيل الفحص على مجلد القالب (تأكد من صحة الاسم)
           ./theme-check/checkbase.php -d . -t alam-al-anika
-        continue-on-error: true # السماح بإكمال الخطوات حتى لو وجد الفحص تحذيرات
+        continue-on-error: true
 
   # المهمة الثانية: فحص جودة الكود البرمجي (PHP)
   php-codesniffer:
@@ -56,19 +51,16 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.0'
-          tools: composer, phpcs # تثبيت phpcs بشكل عام ومباشر
+          tools: composer, phpcs
 
       # الخطوة 3: تثبيت معايير ووردبريس لأداة الفحص
       - name: 'Install WordPress Coding Standards'
         run: |
-          # ====> هذا هو السطر الذي تم تصحيحه <====
-          # استنساخ مستودع معايير ووردبريس الرسمي من فرع main
+          # السطر التالي هو السطر المهم الذي تم تصحيحه
           git clone -b main https://github.com/WordPress/WordPress-Coding-Standards.git wpcs
-          # تسجيل مسار المعايير في إعدادات phpcs
           phpcs --config-set installed_paths "$(pwd)/wpcs"
 
       # الخطوة 4: تشغيل أداة فحص جودة الكود
       - name: 'Run PHP_CodeSniffer'
         run: |
-          # تشغيل الفحص باستخدام المسار الصحيح للأداة
           phpcs . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/js/vendor/*
