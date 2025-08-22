@@ -1,0 +1,40 @@
+# اسم الـ Workflow الذي سيظهر في صفحة Actions على GitHub
+name: 'فحص جودة القالب (WordPress)'
+
+# متى يتم تشغيل هذا الأمر
+on:
+  push:
+    branches:
+      - main # يتم التشغيل عند أي تحديث لفرع main
+  pull_request:
+    branches:
+      - main # يتم التشغيل عند أي طلب دمج لفرع main
+
+# المهام التي سيتم تنفيذها
+jobs:
+  php-codesniffer:
+    name: 'فحص الكود (معايير ووردبريس)'
+    runs-on: ubuntu-latest
+    steps:
+      # الخطوة 1: جلب نسخة من كود القالب
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      # الخطوة 2: إعداد بيئة عمل PHP مع الأدوات المطلوبة
+      - name: 'Setup PHP'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: composer, phpcs
+
+      # الخطوة 3: تثبيت معايير ووردبريس بالطريقة الصحيحة عبر Composer
+      - name: 'Install WordPress Coding Standards via Composer'
+        run: |
+          # هذا الأمر سيقوم بتثبيت المعايير وتهيئتها تلقائيًا
+          composer require --dev wp-coding-standards/wpcs dealerdirect/phpcodesniffer-composer-installer
+
+      # الخطوة 4: تشغيل أداة فحص جودة الكود
+      - name: 'Run PHP_CodeSniffer'
+        run: |
+          # الآن سيعمل الأمر مباشرة لأن Composer قام بكل الإعدادات
+          phpcs . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/js/vendor/*
