@@ -5,10 +5,10 @@ name: 'فحص جودة القالب (WordPress)'
 on:
   push:
     branches:
-      - main
+      - main # يتم التشغيل عند أي تحديث لفرع main
   pull_request:
     branches:
-      - main
+      - main # يتم التشغيل عند أي طلب دمج لفرع main
 
 # المهام التي سيتم تنفيذها
 jobs:
@@ -30,6 +30,7 @@ jobs:
       # الخطوة 3: تثبيت معايير ووردبريس بالطريقة الصحيحة عبر Composer
       - name: 'Install WordPress Coding Standards via Composer'
         run: |
+          # ====> السطر الذي تم تعديله لحل المشكلة <====
           # تهيئة ملف composer.json مع تزويده بالمعلومات الأساسية لتجنب الخطأ
           composer init --quiet --no-interaction --name="alam-al-anika/ci-tools" --description="Tools for CI"
 
