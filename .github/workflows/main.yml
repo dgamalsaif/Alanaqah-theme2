@@ -42,6 +42,8 @@ jobs:
       - name: 'Run Auto-Fixer (phpcbf)'
         run: |
           ./vendor/bin/phpcbf . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/*
+        # تجاهل رمز الخروج 1 للسماح بإكمال المهمة
+        continue-on-error: true
 
       # الخطوة 5: حفظ التعديلات تلقائيًا في المستودع
       - name: 'Commit changes'
