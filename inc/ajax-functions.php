@@ -61,3 +61,75 @@ function alam_al_anika_quick_view_handler() {
     }
     wp_die();
 }
+<?php
+// أضف هذا الكود في نهاية الملف
+
+/**
+ * AJAX handler for Quick View.
+ */
+function alam_al_anika_load_product_quick_view() {
+    if ( ! isset( $_POST['product_id'] ) ) {
+        wp_die();
+    }
+
+    $product_id = intval( $_POST['product_id'] );
+    
+    // قم بتعيين المنتج العالمي حتى تعمل قوالب woocommerce بشكل صحيح
+    wc_setup_product_data( $product_id );
+
+    // استدعاء قالب محتوى المنتج المفرد
+    wc_get_template_part( 'content', 'single-product' );
+
+    wp_die();
+}
+add_action( 'wp_ajax_load_product_quick_view', 'alam_al_anika_load_product_quick_view' );
+add_action( 'wp_ajax_nopriv_load_product_quick_view', 'alam_al_anika_load_product_quick_view' );
+<?php
+// ... الدوال السابقة مثل دالة النظرة السريعة
+
+/**
+ * AJAX handler for Live Product Search.
+ */
+function alam_al_anika_live_product_search() {
+    // التأكد من وجود مصطلح البحث
+    if ( ! isset( $_POST['query'] ) || empty( $_POST['query'] ) ) {
+        wp_die();
+    }
+
+    $search_query = sanitize_text_field( $_POST['query'] );
+
+    $args = array(
+        'post_type'      => 'product',
+        'posts_per_page' => 5, // تحديد عدد النتائج
+        's'              => $search_query
+    );
+
+    $products_query = new WP_Query( $args );
+
+    if ( $products_query->have_posts() ) {
+        echo '<ul class="live-search-list">';
+        while ( $products_query->have_posts() ) {
+            $products_query->the_post();
+            global $product;
+            ?>
+            <li class="live-search-item">
+                <a href="<?php echo esc_url( get_the_permalink() ); ?>">
+                    <?php echo $product->get_image('thumbnail'); // عرض الصورة المصغرة ?>
+                    <div class="item-details">
+                        <span class="item-title"><?php echo get_the_title(); ?></span>
+                        <span class="item-price"><?php echo $product->get_price_html(); ?></span>
+                    </div>
+                </a>
+            </li>
+            <?php
+        }
+        echo '</ul>';
+        wp_reset_postdata();
+    } else {
+        echo '<div class="no-results">لا توجد منتجات مطابقة.</div>';
+    }
+
+    wp_die();
+}
+add_action( 'wp_ajax_live_product_search', 'alam_al_anika_live_product_search' );
+add_action( 'wp_ajax_nopriv_live_product_search', 'alam_al_anika_live_product_search' );
