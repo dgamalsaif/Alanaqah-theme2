@@ -61,7 +61,7 @@ jobs:
       # الخطوة 3: تثبيت معايير ووردبريس لأداة الفحص
       - name: 'Install WordPress Coding Standards'
         run: |
-          # ---== السطر الذي تم تعديله ==---
+          # ====> هذا هو السطر الذي تم تصحيحه <====
           # استنساخ مستودع معايير ووردبريس الرسمي من فرع main
           git clone -b main https://github.com/WordPress/WordPress-Coding-Standards.git wpcs
           # تسجيل مسار المعايير في إعدادات phpcs
