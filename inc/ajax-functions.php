@@ -1,10 +1,6 @@
-```php name=inc/ajax-functions.php
 <?php
 /**
- * AJAX handlers for the Alam Al Anika Theme.
- *
- * This file is intended to handle AJAX requests for features like
- * live search, quick view, etc.
+ * AJAX functions for the theme.
  *
  * @package AlamAlAnika
  */
@@ -13,123 +9,134 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-// To prevent "Cannot redeclare function" errors, any new function you add here
-// should be wrapped in a check like this:
-// if ( ! function_exists( 'your_new_ajax_function_name' ) ) {
-//     function your_new_ajax_function_name() {
-//         // Your AJAX code here
-//     }
-// }
+/**
+ * AJAX handler for live search.
+ */
+function alam_al_anika_live_search() {
+	// 1. Verify nonce for security.
+	check_ajax_referer( 'search-nonce', 'security' );
 
-// Example: AJAX handler for a hypothetical "Quick View" feature.
-/*
-add_action( 'wp_ajax_alam_al_anika_quick_view', 'alam_al_anika_quick_view_handler' );
-add_action( 'wp_ajax_nopriv_alam_al_anika_quick_view', 'alam_al_anika_quick_view_handler' );
+	// 2. Sanitize user input.
+	$search_query = isset( $_POST['query'] ) ? sanitize_text_field( wp_unslash( $_POST['query'] ) ) : '';
 
-if ( ! function_exists( 'alam_al_anika_quick_view_handler' ) ) {
-    function alam_al_anika_quick_view_handler() {
-        // Security check
-        check_ajax_referer( 'quick_view_nonce', 'nonce' );
+	if ( empty( $search_query ) ) {
+		wp_die();
+	}
 
-        // Get product ID from the AJAX request
-        $product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
+	$args = array(
+		'post_type'      => 'product',
+		'posts_per_page' => 5,
+		's'              => $search_query,
+	);
 
-        if ( $product_id > 0 ) {
-            // Setup product data and send back the HTML for a modal
-            // ...
-        }
+	$query = new WP_Query( $args );
 
-        wp_die(); // This is required to terminate immediately and return a proper response
-    }
+	if ( $query->have_posts() ) {
+		echo '<ul class="live-search-list">';
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			global $product;
+			?>
+			<li class="live-search-item">
+				<a href="<?php echo esc_url( get_the_permalink() ); ?>">
+					<?php echo wp_kses_post( $product->get_image( 'thumbnail' ) ); ?>
+					<div class="item-details">
+						<span class="item-title"><?php echo esc_html( get_the_title() ); ?></span>
+						<span class="item-price"><?php echo wp_kses_post( $product->get_price_html() ); ?></span>
+					</div>
+				</a>
+			</li>
+			<?php
+		}
+		echo '</ul>';
+	} else {
+		echo '<div class="no-results">' . esc_html__( 'No products found', 'alam-al-anika' ) . '</div>';
+	}
+
+	wp_reset_postdata();
+	wp_die();
 }
-add_action( 'wp_ajax_alam_al_anika_quick_view', 'alam_al_anika_quick_view_handler' );
-add_action( 'wp_ajax_nopriv_alam_al_anika_quick_view', 'alam_al_anika_quick_view_handler' );
+add_action( 'wp_ajax_alam_al_anika_live_search', 'alam_al_anika_live_search' );
+add_action( 'wp_ajax_nopriv_alam_al_anika_live_search', 'alam_al_anika_live_search' );
 
-function alam_al_anika_quick_view_handler() {
-    $product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
-    if ( $product_id > 0 ) {
-        $product = wc_get_product( $product_id );
-        if ( $product ) {
-            echo '<div class="modal-content">';
-            echo '<img src="' . get_the_post_thumbnail_url( $product_id, 'medium' ) . '" style="width:100%;border-radius:8px;margin-bottom:16px;" />';
-            echo '<h2>' . $product->get_name() . '</h2>';
-            echo wc_price( $product->get_price() );
-            echo '<p>' . $product->get_short_description() . '</p>';
-            echo '<a href="' . get_permalink( $product_id ) . '" class="button" style="margin-top:12px;">' . __('View Product','alam-al-anika') . '</a>';
-            echo '</div>';
-        }
-    }
-    wp_die();
-}
-<?php
-// أضف هذا الكود في نهاية الملف
 
 /**
- * AJAX handler for Quick View.
+ * AJAX handler for adding products to the cart.
  */
-function alam_al_anika_load_product_quick_view() {
-    if ( ! isset( $_POST['product_id'] ) ) {
-        wp_die();
-    }
+function alam_al_anika_add_to_cart() {
+	// 1. Verify nonce for security.
+	check_ajax_referer( 'add-to-cart-nonce', 'security' );
 
-    $product_id = intval( $_POST['product_id'] );
-    
-    // قم بتعيين المنتج العالمي حتى تعمل قوالب woocommerce بشكل صحيح
-    wc_setup_product_data( $product_id );
+	// 2. Sanitize all inputs.
+	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+	$quantity   = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 1;
 
-    // استدعاء قالب محتوى المنتج المفرد
-    wc_get_template_part( 'content', 'single-product' );
+	if ( ! $product_id ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Invalid product.', 'alam-al-anika' ) ) );
+		return;
+	}
 
-    wp_die();
+	$passed_validation = apply_filters( 'woocommerce_add_to_cart_validation', true, $product_id, $quantity );
+
+	if ( $passed_validation && WC()->cart->add_to_cart( $product_id, $quantity ) ) {
+		do_action( 'woocommerce_ajax_added_to_cart', $product_id );
+		wp_send_json_success(
+			array(
+				'message'      => esc_html__( 'Product added to cart successfully.', 'alam-al-anika' ),
+				'cart_count'   => WC()->cart->get_cart_contents_count(),
+				'cart_subtotal' => WC()->cart->get_cart_subtotal(),
+			)
+		);
+	} else {
+		wp_send_json_error( array( 'message' => esc_html__( 'Failed to add product to cart.', 'alam-al-anika' ) ) );
+	}
+
+	wp_die();
 }
-add_action( 'wp_ajax_load_product_quick_view', 'alam_al_anika_load_product_quick_view' );
-add_action( 'wp_ajax_nopriv_load_product_quick_view', 'alam_al_anika_load_product_quick_view' );
-<?php
-// ... الدوال السابقة مثل دالة النظرة السريعة
+add_action( 'wp_ajax_alam_al_anika_add_to_cart', 'alam_al_anika_add_to_cart' );
+add_action( 'wp_ajax_nopriv_alam_al_anika_add_to_cart', 'alam_al_anika_add_to_cart' );
+
 
 /**
- * AJAX handler for Live Product Search.
+ * AJAX handler for the quick view modal.
  */
-function alam_al_anika_live_product_search() {
-    // التأكد من وجود مصطلح البحث
-    if ( ! isset( $_POST['query'] ) || empty( $_POST['query'] ) ) {
-        wp_die();
-    }
+function alam_al_anika_quick_view() {
+	// 1. Verify nonce for security.
+	check_ajax_referer( 'quick-view-nonce', 'security' );
 
-    $search_query = sanitize_text_field( $_POST['query'] );
+	// 2. Sanitize input.
+	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
 
-    $args = array(
-        'post_type'      => 'product',
-        'posts_per_page' => 5, // تحديد عدد النتائج
-        's'              => $search_query
-    );
+	if ( ! $product_id ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Invalid product ID.', 'alam-al-anika' ) ) );
+		return;
+	}
 
-    $products_query = new WP_Query( $args );
+	// Set the main query to the specific product.
+	$query_args = array(
+		'p'         => $product_id,
+		'post_type' => 'product',
+	);
 
-    if ( $products_query->have_posts() ) {
-        echo '<ul class="live-search-list">';
-        while ( $products_query->have_posts() ) {
-            $products_query->the_post();
-            global $product;
-            ?>
-            <li class="live-search-item">
-                <a href="<?php echo esc_url( get_the_permalink() ); ?>">
-                    <?php echo $product->get_image('thumbnail'); // عرض الصورة المصغرة ?>
-                    <div class="item-details">
-                        <span class="item-title"><?php echo get_the_title(); ?></span>
-                        <span class="item-price"><?php echo $product->get_price_html(); ?></span>
-                    </div>
-                </a>
-            </li>
-            <?php
-        }
-        echo '</ul>';
-        wp_reset_postdata();
-    } else {
-        echo '<div class="no-results">لا توجد منتجات مطابقة.</div>';
-    }
+	$query = new WP_Query( $query_args );
 
-    wp_die();
+	ob_start();
+
+	if ( $query->have_posts() ) {
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			// Use WooCommerce's template for consistency.
+			wc_get_template_part( 'content', 'single-product' );
+		}
+	}
+
+	wp_reset_postdata();
+
+	$content = ob_get_clean();
+
+	wp_send_json_success( array( 'content' => $content ) );
+
+	wp_die();
 }
-add_action( 'wp_ajax_live_product_search', 'alam_al_anika_live_product_search' );
-add_action( 'wp_ajax_nopriv_live_product_search', 'alam_al_anika_live_product_search' );
+add_action( 'wp_ajax_alam_al_anika_quick_view', 'alam_al_anika_quick_view' );
+add_action( 'wp_ajax_nopriv_alam_al_anika_quick_view', 'alam_al_anika_quick_view' );
