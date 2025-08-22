@@ -1,0 +1,29 @@
+# اسم الـ Workflow
+name: 'Cleanup Old Workflow Runs'
+
+# متى يتم تشغيله
+on:
+  # يمكنك تشغيله يدويًا من تبويب Actions
+  workflow_dispatch:
+
+  # أو تشغيله بشكل مجدول (هنا يتم تشغيله مرة كل ليلة)
+  schedule:
+    - cron: '0 2 * * *' #
+jobs:
+  delete-old-runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Delete old workflow runs'
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          # توكن المصادقة (مطلوب)
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+          # معرف المستودع (مطلوب)
+          repository: ${{ github.repository }}
+
+          # حذف السجلات الأقدم من 90 يومًا
+          retain_days: 90
+
+          # الحفاظ على 5 سجلات على الأقل دائمًا
+          keep_minimum_runs: 5
