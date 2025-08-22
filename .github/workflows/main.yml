@@ -7,6 +7,11 @@ on:
     branches:
       - main
 
+# ====> هذا هو الجزء الجديد الذي تم إضافته <====
+# منح صلاحية الكتابة للـ workflow ليتمكن من حفظ التعديلات
+permissions:
+  contents: write
+
 # المهام التي سيتم تنفيذها
 jobs:
   fix-code-style:
@@ -35,11 +40,8 @@ jobs:
 
       # الخطوة 4: تشغيل أداة الإصلاح التلقائي
       - name: 'Run Auto-Fixer (phpcbf)'
-        # ====> هذا هو التعديل الأخير <====
-        # تجاهل كود الخروج الخاص بالأداة للسماح بإكمال الخطوات
-        continue-on-error: true
         run: |
-          ./vendor/bin/phpcbf . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/js/*
+          ./vendor/bin/phpcbf . --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/assets/*
 
       # الخطوة 5: حفظ التعديلات تلقائيًا في المستودع
       - name: 'Commit changes'
