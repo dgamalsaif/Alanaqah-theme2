@@ -1,4 +1,4 @@
- <?php
+<?php
 /**
  * The sidebar containing the main widget area.
  *
@@ -17,7 +17,7 @@ if ( ! is_active_sidebar( 'shop-sidebar' ) ) {
 
 <aside id="secondary" class="widget-area filter-sidebar" role="complementary">
 	<?php
-    // This function displays the widgets that you add in Appearance > Widgets.
-    dynamic_sidebar( 'shop-sidebar' );
-    ?>
+	// This function displays the widgets that you add in Appearance > Widgets.
+	dynamic_sidebar( 'shop-sidebar' );
+	?>
 </aside><!-- #secondary -->

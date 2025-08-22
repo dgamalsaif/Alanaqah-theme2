@@ -36,7 +36,7 @@ if ( post_password_required() ) {
 					'<span>' . wp_kses_post( get_the_title() ) . '</span>'
 				);
 			} else {
-				printf( 
+				printf(
 					/* translators: 1: comment count number, 2: post title. */
 					esc_html( _nx( '%1$s thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', $alam_al_anika_comment_count, 'comments title', 'alam-al-anika' ) ),
 					number_format_i18n( $alam_al_anika_comment_count ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -52,9 +52,9 @@ if ( post_password_required() ) {
 			<?php
 			wp_list_comments(
 				array(
-					'style'      => 'ol',
-					'short_ping' => true,
-                    'avatar_size' => 60,
+					'style'       => 'ol',
+					'short_ping'  => true,
+					'avatar_size' => 60,
 				)
 			);
 			?>

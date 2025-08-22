@@ -18,12 +18,15 @@ if ( ! function_exists( 'alam_al_anika_setup' ) ) :
 		add_theme_support( 'automatic-feed-links' );
 		add_theme_support( 'title-tag' );
 		add_theme_support( 'post-thumbnails' );
-        add_theme_support( 'custom-logo', array(
-            'height'      => 50,
-            'width'       => 150,
-            'flex-height' => true,
-            'flex-width'  => true,
-        ) );
+		add_theme_support(
+			'custom-logo',
+			array(
+				'height'      => 50,
+				'width'       => 150,
+				'flex-height' => true,
+				'flex-width'  => true,
+			)
+		);
 		add_theme_support( 'woocommerce' );
 		add_theme_support( 'wc-product-gallery-zoom' );
 		add_theme_support( 'wc-product-gallery-lightbox' );
@@ -49,31 +52,31 @@ add_action( 'after_setup_theme', 'alam_al_anika_setup' );
  * Enqueue scripts and styles.
  */
 function alam_al_anika_scripts() {
-    // Main theme stylesheet.
-    wp_enqueue_style( 'alam-al-anika-main-style', get_template_directory_uri() . '/assets/css/main.css', array(), ALAM_AL_ANIKA_VERSION );
+	// Main theme stylesheet.
+	wp_enqueue_style( 'alam-al-anika-main-style', get_template_directory_uri() . '/assets/css/main.css', array(), ALAM_AL_ANIKA_VERSION );
 
-    // Responsive stylesheet. It depends on the main style to load after it.
-    wp_enqueue_style( 'alam-al-anika-responsive', get_template_directory_uri() . '/assets/css/responsive.css', array('alam-al-anika-main-style'), ALAM_AL_ANIKA_VERSION );
+	// Responsive stylesheet. It depends on the main style to load after it.
+	wp_enqueue_style( 'alam-al-anika-responsive', get_template_directory_uri() . '/assets/css/responsive.css', array( 'alam-al-anika-main-style' ), ALAM_AL_ANIKA_VERSION );
 
-    // This line is for the theme's root style.css, which mainly contains theme information.
-    // It's good practice to enqueue it, though it has no styles in this theme.
-    wp_enqueue_style( 'alam-al-anika-style', get_stylesheet_uri(), array('alam-al-anika-main-style'), ALAM_AL_ANIKA_VERSION );
+	// This line is for the theme's root style.css, which mainly contains theme information.
+	// It's good practice to enqueue it, though it has no styles in this theme.
+	wp_enqueue_style( 'alam-al-anika-style', get_stylesheet_uri(), array( 'alam-al-anika-main-style' ), ALAM_AL_ANIKA_VERSION );
 
-    // This line loads your local Font Awesome library.
-    wp_enqueue_style( 'font-awesome', get_template_directory_uri() . '/assets/fonts/font-awesome/css/all.min.css', array(), '6.4.0' );
+	// This line loads your local Font Awesome library.
+	wp_enqueue_style( 'font-awesome', get_template_directory_uri() . '/assets/fonts/font-awesome/css/all.min.css', array(), '6.4.0' );
 
-    // --- JS Files ---
-    wp_deregister_script( 'jquery' );
-    wp_register_script( 'jquery', get_template_directory_uri() . '/assets/js/vendor/jquery-3.7.1.js', array(), '3.7.1', true );
-    wp_enqueue_script( 'jquery' );
+	// --- JS Files ---
+	wp_deregister_script( 'jquery' );
+	wp_register_script( 'jquery', get_template_directory_uri() . '/assets/js/vendor/jquery-3.7.1.js', array(), '3.7.1', true );
+	wp_enqueue_script( 'jquery' );
 
-    // Note: The individual JS files like slider, product, filters seem to be combined into main.js in the HTML version.
-    // For simplicity and correctness, we will load main.js which contains all needed functionality.
-    wp_enqueue_script( 'alam-al-anika-main', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), ALAM_AL_ANIKA_VERSION, true );
+	// Note: The individual JS files like slider, product, filters seem to be combined into main.js in the HTML version.
+	// For simplicity and correctness, we will load main.js which contains all needed functionality.
+	wp_enqueue_script( 'alam-al-anika-main', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), ALAM_AL_ANIKA_VERSION, true );
 
-    if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-        wp_enqueue_script( 'comment-reply' );
-    }
+	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+		wp_enqueue_script( 'comment-reply' );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'alam_al_anika_scripts' );
 /**
@@ -99,34 +102,34 @@ add_action( 'widgets_init', 'alam_al_anika_widgets_init' );
  */
 function alam_al_anika_register_slides_cpt() {
 	$labels = array(
-		'name'                  => _x( 'Slides', 'Post Type General Name', 'alam-al-anika' ),
-		'singular_name'         => _x( 'Slide', 'Post Type Singular Name', 'alam-al-anika' ),
-		'menu_name'             => __( 'Hero Slides', 'alam-al-anika' ),
-		'name_admin_bar'        => __( 'Slide', 'alam-al-anika' ),
-		'all_items'             => __( 'All Slides', 'alam-al-anika' ),
-		'add_new_item'          => __( 'Add New Slide', 'alam-al-anika' ),
-		'add_new'               => __( 'Add New', 'alam-al-anika' ),
-		'new_item'              => __( 'New Slide', 'alam-al-anika' ),
-		'edit_item'             => __( 'Edit Slide', 'alam-al-anika' ),
+		'name'           => _x( 'Slides', 'Post Type General Name', 'alam-al-anika' ),
+		'singular_name'  => _x( 'Slide', 'Post Type Singular Name', 'alam-al-anika' ),
+		'menu_name'      => __( 'Hero Slides', 'alam-al-anika' ),
+		'name_admin_bar' => __( 'Slide', 'alam-al-anika' ),
+		'all_items'      => __( 'All Slides', 'alam-al-anika' ),
+		'add_new_item'   => __( 'Add New Slide', 'alam-al-anika' ),
+		'add_new'        => __( 'Add New', 'alam-al-anika' ),
+		'new_item'       => __( 'New Slide', 'alam-al-anika' ),
+		'edit_item'      => __( 'Edit Slide', 'alam-al-anika' ),
 	);
 	$args   = array(
-		'label'                 => __( 'Slide', 'alam-al-anika' ),
-		'description'           => __( 'Slides for the homepage hero section.', 'alam-al-anika' ),
-		'labels'                => $labels,
-		'supports'              => array( 'title', 'editor', 'thumbnail' ),
-		'hierarchical'          => false,
-		'public'                => true,
-		'show_ui'               => true,
-		'show_in_menu'          => true,
-		'menu_position'         => 5,
-		'menu_icon'             => 'dashicons-images-alt2',
-		'show_in_admin_bar'     => true,
-		'show_in_nav_menus'     => false,
-		'can_export'            => true,
-		'has_archive'           => false,
-		'exclude_from_search'   => true,
-		'publicly_queryable'    => false,
-		'capability_type'       => 'page',
+		'label'               => __( 'Slide', 'alam-al-anika' ),
+		'description'         => __( 'Slides for the homepage hero section.', 'alam-al-anika' ),
+		'labels'              => $labels,
+		'supports'            => array( 'title', 'editor', 'thumbnail' ),
+		'hierarchical'        => false,
+		'public'              => true,
+		'show_ui'             => true,
+		'show_in_menu'        => true,
+		'menu_position'       => 5,
+		'menu_icon'           => 'dashicons-images-alt2',
+		'show_in_admin_bar'   => true,
+		'show_in_nav_menus'   => false,
+		'can_export'          => true,
+		'has_archive'         => false,
+		'exclude_from_search' => true,
+		'publicly_queryable'  => false,
+		'capability_type'     => 'page',
 	);
 	register_post_type( 'slide', $args );
 }

@@ -82,8 +82,8 @@ function alam_al_anika_add_to_cart() {
 		do_action( 'woocommerce_ajax_added_to_cart', $product_id );
 		wp_send_json_success(
 			array(
-				'message'      => esc_html__( 'Product added to cart successfully.', 'alam-al-anika' ),
-				'cart_count'   => WC()->cart->get_cart_contents_count(),
+				'message'       => esc_html__( 'Product added to cart successfully.', 'alam-al-anika' ),
+				'cart_count'    => WC()->cart->get_cart_contents_count(),
 				'cart_subtotal' => WC()->cart->get_cart_subtotal(),
 			)
 		);

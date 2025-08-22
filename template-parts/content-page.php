@@ -1,4 +1,4 @@
- <?php
+<?php
 /**
  * Template part for displaying page content in page.php
  *
@@ -15,10 +15,10 @@
 	</header><!-- .entry-header -->
 
 	<?php if ( has_post_thumbnail() ) : ?>
-        <div class="post-thumbnail" style="margin-bottom: 20px;">
-            <?php the_post_thumbnail( 'full' ); ?>
-        </div>
-    <?php endif; ?>
+		<div class="post-thumbnail" style="margin-bottom: 20px;">
+			<?php the_post_thumbnail( 'full' ); ?>
+		</div>
+	<?php endif; ?>
 
 	<div class="entry-content">
 		<?php

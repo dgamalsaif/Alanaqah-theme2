@@ -33,6 +33,7 @@ get_header();
 		endwhile; // End of the loop.
 		?>
 
-	</main><?php
-get_sidebar();
-get_footer();
+	</main>
+	<?php
+	get_sidebar();
+	get_footer();
