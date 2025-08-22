@@ -31,10 +31,10 @@ jobs:
       - name: 'Install WordPress Coding Standards via Composer'
         run: |
           # ====> السطر الجديد الذي تم إضافته لحل المشكلة <====
-          # السماح للإضافة الضرورية بالعمل
-          composer config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          # تهيئة ملف composer.json فارغ لتجنب الخطأ
+          composer init --quiet --no-interaction
 
-          # هذا الأمر سيقوم بتثبيت المعايير وتهيئتها تلقائيًا
+          # الآن سيقوم هذا الأمر بتثبيت المعايير وتهيئتها تلقائيًا
           composer require --dev wp-coding-standards/wpcs dealerdirect/phpcodesniffer-composer-installer
 
       # الخطوة 4: تشغيل أداة فحص جودة الكود
