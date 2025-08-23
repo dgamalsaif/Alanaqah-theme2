@@ -1,4 +1,4 @@
-(function($) {
+ (function($) {
     "use strict";
 
     $(document).ready(function() {
@@ -198,3 +198,77 @@ jQuery(document).ready(function($) {
     }
 });
 })(jQuery);
+jQuery(document).ready(function($) {
+    'use strict';
+
+    // --- تحسينات البحث المباشر ---
+    var searchTimeout;
+    $('.search-field').on('keyup', function() {
+        var searchQuery = $(this).val();
+        var resultsContainer = $('#live-search-results');
+
+        clearTimeout(searchTimeout);
+
+        if (searchQuery.length > 2) {
+            resultsContainer.html('<div class="loading-results">جاري البحث...</div>').show(); // إظهار مؤشر التحميل
+
+            searchTimeout = setTimeout(function() {
+                $.ajax({
+                    url: alam_anika_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'alam_al_anika_live_search',
+                        query: searchQuery,
+                        security: alam_anika_ajax.search_nonce
+                    },
+                    success: function(response) {
+                        resultsContainer.html(response).show();
+                    }
+                });
+            }, 500);
+        } else {
+            resultsContainer.hide();
+        }
+    });
+    
+    // إخفاء نتائج البحث عند النقر خارجها
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.search-container').length) {
+            $('#live-search-results').hide();
+        }
+    });
+
+
+    // --- تفعيل نافذة الإشعارات ---
+    function showNotification(message, isSuccess) {
+        var notification = $('#notification');
+        notification.text(message);
+        notification.css('background-color', isSuccess ? '#28a745' : '#dc3545'); // أخضر للنجاح، أحمر للفشل
+        notification.addClass('show');
+
+        setTimeout(function() {
+            notification.removeClass('show');
+        }, 4000);
+    }
+
+    // مثال على استخدامها عند إضافة منتج للسلة (يجب تعديل كود الإضافة للسلة)
+    // showNotification('تمت إضافة المنتج بنجاح!', true);
+
+
+    // --- تفعيل النوافذ المنبثقة الأخرى (Modal) ---
+    // هذا الكود يضيف وظيفة أساسية لفتح وإغلاق أي نافذة منبثقة
+    // يمكنك استدعاؤها لنافذة "دليل المقاسات" وغيرها
+    
+    // مثال لفتح نافذة دليل المقاسات عند النقر على زر
+    $('.size-guide-trigger').on('click', function(e) {
+        e.preventDefault();
+        $('#size-guide-modal').fadeIn();
+    });
+
+    // إغلاق النافذة عند النقر على زر الإغلاق أو الخلفية
+    $('.modal-overlay, .modal-close').on('click', function() {
+        $('.size-guide-modal').fadeOut();
+        // أضف هنا أي نوافذ أخرى تريد إغلاقها
+    });
+
+});
