@@ -3,7 +3,7 @@
         'name' => 'alam-al-anika/ci-tools',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '42c4e8ba11fc40cfa46a39f5ca4c4e1372a6de50',
+        'reference' => '1c5510b745541e8b52998eb74adef83e42f021d9',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'alam-al-anika/ci-tools' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '42c4e8ba11fc40cfa46a39f5ca4c4e1372a6de50',
+            'reference' => '1c5510b745541e8b52998eb74adef83e42f021d9',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
