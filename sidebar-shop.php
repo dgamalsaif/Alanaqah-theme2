@@ -6,15 +6,15 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly.
+	exit; // Exit if accessed directly.
 }
 
 // If the shop sidebar has no widgets, do nothing.
 if ( ! is_active_sidebar( 'shop-sidebar' ) ) {
-    return;
+	return;
 }
 ?>
 
 <aside id="secondary" class="widget-area">
-    <?php dynamic_sidebar( 'shop-sidebar' ); ?>
+	<?php dynamic_sidebar( 'shop-sidebar' ); ?>
 </aside>```
