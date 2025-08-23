@@ -763,3 +763,257 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+/*
+==================================
+تنسيقات احترافية لأجزاء WooCommerce
+==================================
+*/
+
+/* --- صفحة المنتج المفرد --- */
+/* تحسين تخطيط الصفحة */
+.woocommerce div.product {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+/* تحسين معرض الصور */
+.woocommerce div.product div.images.woocommerce-product-gallery {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.woocommerce div.product div.images .flex-control-thumbs li {
+    padding: 5px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.woocommerce div.product div.images .flex-control-thumbs li img.flex-active {
+    border-color: var(--primary-color);
+}
+
+/* تحسين معلومات المنتج */
+.summary.entry-summary {
+    display: flex;
+    flex-direction: column;
+}
+
+.product_title {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.woocommerce-product-rating {
+    margin-bottom: 15px;
+}
+
+.woocommerce div.product p.price, .woocommerce div.product span.price {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.woocommerce-product-details__short-description {
+    color: var(--text-light);
+    margin-bottom: 20px;
+}
+
+/* تحسين زر الإضافة للسلة */
+.woocommerce div.product form.cart {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.woocommerce div.product form.cart .quantity {
+    margin-right: 10px;
+}
+.woocommerce div.product form.cart .button {
+    flex-grow: 1;
+    font-size: 16px;
+    padding: 12px 20px;
+}
+
+/* تحسين علامات التبويب (Tabs) */
+.woocommerce-tabs ul.tabs {
+    border-bottom: 2px solid var(--border-color);
+    padding: 0;
+    margin-bottom: 30px;
+}
+.woocommerce-tabs ul.tabs::before {
+    display: none;
+}
+.woocommerce-tabs ul.tabs li {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0 25px 0 0;
+}
+.woocommerce-tabs ul.tabs li a {
+    color: var(--text-light);
+    font-weight: 600;
+    padding: 10px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+.woocommerce-tabs ul.tabs li.active a,
+.woocommerce-tabs ul.tabs li a:hover {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+.woocommerce-tabs .panel {
+    padding: 0;
+}
+
+
+/* --- صفحات سلة التسوق والدفع --- */
+.woocommerce-cart-form, .woocommerce-checkout {
+    background: #fff;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.woocommerce table.shop_table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+.woocommerce table.shop_table th {
+    background-color: var(--light-gray);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.woocommerce .cart-collaterals .cart_totals, 
+#order_review {
+    background-color: var(--light-gray);
+    padding: 25px;
+    border-radius: 8px;
+}
+.woocommerce .checkout_coupon {
+    margin-bottom: 20px;
+}
+
+
+/* --- صفحة حسابي --- */
+.woocommerce-account .woocommerce {
+    display: flex;
+    gap: 30px;
+}
+.woocommerce-account .woocommerce-MyAccount-navigation {
+    flex: 0 0 250px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+.woocommerce-account .woocommerce-MyAccount-navigation ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.woocommerce-account .woocommerce-MyAccount-navigation ul li a {
+    display: block;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+.woocommerce-account .woocommerce-MyAccount-navigation ul li.is-active > a {
+    background-color: var(--primary-color);
+    color: white;
+}
+.woocommerce-account .woocommerce-MyAccount-content {
+    flex-grow: 1;
+}
+
+
+/*
+==================================
+تنسيقات احترافية لأجزاء ووردبريس
+==================================
+*/
+
+/* --- قسم التعليقات --- */
+.comments-area {
+    margin-top: 40px;
+}
+.comment-form input[type="text"],
+.comment-form input[type="email"],
+.comment-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+.comment-form .submit {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* --- صفحات الأرشيف والبحث --- */
+.search-results .page-header,
+.archive .page-header {
+    padding: 20px;
+    background-color: var(--light-gray);
+    border-radius: 8px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* --- صفحة الخطأ 404 --- */
+.error-404 .page-header {
+    text-align: center;
+}
+.error-404 .page-content {
+    text-align: center;
+    padding: 40px 20px;
+}
+.error-404 .page-content .search-form {
+    max-width: 400px;
+    margin: 30px auto 0;
+}
+/*
+==================================
+تحسينات احترافية لشارة التخفيض
+==================================
+*/
+
+/* الخطوة 1: جعل حاوية الصورة مرجعًا للشارة */
+.woocommerce ul.products li.product .woocommerce-loop-product__link {
+    position: relative;
+    display: block;
+}
+
+/* الخطوة 2: إعادة تصميم الشارة بشكل كامل */
+.woocommerce span.onsale {
+    position: absolute;
+    top: 12px;
+    right: 12px; /* تغيير الموقع إلى اليمين */
+    left: auto; /* إلغاء الموقع من اليسار */
+    
+    /* تحويلها إلى دائرة أنيقة */
+    width: 48px;
+    height: 48px;
+    line-height: 48px; /* لمحاذاة النص عموديًا */
+    text-align: center; /* لمحاذاة النص أفقيًا */
+    border-radius: 50%;
+    
+    /* تحسين الألوان والخطوط */
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+
+    /* التأكد من أنها فوق كل العناصر الأخرى */
+    z-index: 2;
+    margin: 0;
+    padding: 0;
+    min-height: 0;
+    min-width: 0;
+}
